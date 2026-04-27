@@ -3,9 +3,9 @@
 session_start();
 require_once '../config/functions.php'; // Koneksi Database
 
-// Cek Login
+// Cek Login: Pastikan mengarah langsung ke login.php di folder yang sama
 if (!isset($_SESSION['status_login'])) {
-    header("Location: login.php");
+    header("Location: /spkmobilindo/admin/login.php");
     exit;
 }
 ?>
@@ -33,13 +33,13 @@ if (!isset($_SESSION['status_login'])) {
         <h5 class="text-white fw-bold">PANEL ADMIN</h5>
         <small class="text-muted">Sadulur Mobilindo</small>
     </div>
-    <a href="index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-    <a href="data_mobil.php"><i class="bi bi-car-front-fill me-2"></i> Data Mobil</a>
-    <a href="data_kriteria.php"><i class="bi bi-list-task me-2"></i> Data Kriteria</a>
-    <a href="hitung_spk.php"><i class="bi bi-calculator me-2"></i> Perhitungan SPK</a>
-    <a href="laporan_cetak.php"><i class="bi bi-file-earmark-pdf me-2"></i> Laporan</a>
+    <a href="/spkmobilindo/admin/index.php"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+    <a href="/spkmobilindo/admin/data_mobil.php"><i class="bi bi-car-front-fill me-2"></i> Data Mobil</a>
+    <a href="/spkmobilindo/admin/data_kriteria.php"><i class="bi bi-list-task me-2"></i> Data Kriteria</a>
+    <a href="/spkmobilindo/admin/hitung_spk.php"><i class="bi bi-calculator me-2"></i> Perhitungan SPK</a>
+    <a href="/spkmobilindo/admin/laporan_cetak.php"><i class="bi bi-file-earmark-pdf me-2"></i> Laporan</a>
     <hr class="border-secondary mx-3">
-    <a href="logout.php" class="text-danger"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+    <a href="/spkmobilindo/admin/logout.php" class="text-danger"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
 </div>
 
 <div class="main-content">

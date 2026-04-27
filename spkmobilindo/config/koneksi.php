@@ -5,22 +5,20 @@
  */
 
 // Konfigurasi Database
-// Sesuaikan dengan settingan XAMPP/Laragon anda
 $host = "localhost";
-$user = "root";      // Default user XAMPP biasanya 'root'
-$pass = "";          // Default password XAMPP biasanya kosong
-$db   = "db_spkmobilindo"; // Nama database yang tadi kita buat
+$user = "root";      // Default user XAMPP/Laragon
+$pass = "";          // Kosongkan jika tidak mengatur password database
+$db   = "db_spkmobilindo"; // Nama database Anda
 
-// Melakukan koneksi menggunakan MySQLi (Style Procedural)
+// Melakukan koneksi menggunakan MySQLi
 $conn = mysqli_connect($host, $user, $pass, $db);
 
 // Cek apakah koneksi berhasil
 if (!$conn) {
-    // Jika gagal, matikan proses dan tampilkan pesan error
-    // Ini penting untuk debugging saat development
-    die("Koneksi Database Gagal: " . mysqli_connect_error());
+    // Memberikan pesan error yang lebih spesifik untuk memudahkan perbaikan di laptop baru
+    die("Koneksi Database Gagal! Periksa apakah MySQL di XAMPP sudah menyala dan database '" . $db . "' sudah di-import. Error: " . mysqli_connect_error());
 }
 
-// Jika file ini diakses langsung dan layar putih (blank), 
-// berarti koneksi BERHASIL.
+// Set charset ke utf8 agar pembacaan karakter simbol (seperti Rp) tidak berantakan
+mysqli_set_charset($conn, "utf8");
 ?>
