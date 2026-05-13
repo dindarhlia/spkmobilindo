@@ -78,7 +78,7 @@ if (isset($_POST['submit'])) {
                     <h6 class="fw-bold text-secondary mb-3">Penilaian Kriteria (MOORA)</h6>
                     <div class="alert alert-info small py-2">
                         Isi penilaian kondisi secara objektif (Skala 1 - 5). <br>
-                        1 = Sangat Buruk, 5 = Sangat Baik/Lengkap.
+                        1 = Tidak Penting, 5 = Sangat Penting.
                     </div>
 
                     <div class="row">
@@ -109,13 +109,13 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Jenis Transmisi</label>
-                        <select name="transmisi" class="form-select" required>
-                            <option value="Manual" <?= ($is_edit && $data['transmisi'] == 'Manual') ? 'selected' : ''; ?>>Manual</option>
-                            <option value="Matic" <?= ($is_edit && $data['transmisi'] == 'Matic') ? 'selected' : ''; ?>>Matic</option>
-                        </select>
-                        <div class="form-text text-danger">*Matic bernilai 5, Manual bernilai 3 (Otomatis)</div>
-                    </div>
+    <label class="form-label">Pajak Kendaraan</label>
+    <select name="pajak_kendaraan" class="form-select" required>
+        <option value="Hidup" <?= ($is_edit && $data['pajak_kendaraan'] == 'Hidup') ? 'selected' : ''; ?>>Pajak Hidup</option>
+        <option value="Mati" <?= ($is_edit && $data['pajak_kendaraan'] == 'Mati') ? 'selected' : ''; ?>>Pajak Mati</option>
+    </select>
+    <div class="form-text text-danger">*Pajak Hidup bernilai 5, Pajak Mati bernilai 3 (Otomatis)</div>
+</div>
 
                     <div class="mb-3">
                         <label class="form-label">Deskripsi Tambahan</label>

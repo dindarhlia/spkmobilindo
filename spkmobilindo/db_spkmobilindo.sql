@@ -1,12 +1,21 @@
 -- phpMyAdmin SQL Dump
--- Version: 5.2.0
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
 -- Host: 127.0.0.1
--- Server version: 10.4.24-MariaDB
--- PHP Version: 8.1.6
+-- Generation Time: May 13, 2026 at 06:48 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `db_spkmobilindo`
@@ -22,22 +31,66 @@ CREATE TABLE `tb_admin` (
   `id_admin` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `nama_lengkap` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `nama_lengkap` varchar(100) NOT NULL,
+  `role` enum('admin','owner') NOT NULL DEFAULT 'admin'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_admin`
--- Password default: admin123 (menggunakan MD5)
 --
 
-INSERT INTO `tb_admin` (`id_admin`, `username`, `password`, `nama_lengkap`) VALUES
-(1, 'admin', '0192023a7bbd73250516f069df18b500', 'Admin Sadulur Mobilindo');
+INSERT INTO `tb_admin` (`id_admin`, `username`, `password`, `nama_lengkap`, `role`) VALUES
+(1, 'admin', '0192023a7bbd73250516f069df18b500', 'Admin Sadulur Mobilindo', 'admin'),
+(2, 'owner', '5be057accb25758101fa5eadbbd79503', 'Owner Sadulur Mobilindo', 'owner');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_alternatif`
+--
+
+CREATE TABLE `tb_alternatif` (
+  `id_mobil` int(11) NOT NULL,
+  `nama_mobil` varchar(100) NOT NULL,
+  `merek` varchar(50) NOT NULL,
+  `harga_asli` bigint(20) DEFAULT NULL,
+  `tahun` int(11) DEFAULT NULL,
+  `jarak_tempuh` int(11) DEFAULT NULL,
+  `pajak_kendaraan` varchar(20) NOT NULL,
+  `deskripsi` text NOT NULL,
+  `foto_mobil` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tb_alternatif`
+--
+
+INSERT INTO `tb_alternatif` (`id_mobil`, `nama_mobil`, `merek`, `harga_asli`, `tahun`, `jarak_tempuh`, `pajak_kendaraan`, `deskripsi`, `foto_mobil`) VALUES
+(10, 'Nissan Grand Livina', 'Nissan', 115000000, 2014, 92500, 'Hidup', 'Varian Highway Star dengan bodi kit orisinal yang masih lengkap. Pajak hidup panjang, interior bersih, dan performa mesin masih sangat stabil untuk pemakaian harian.', '69ef573c610cb.jpg'),
+(11, 'Nissan Serena C26', 'Nissan', 135000000, 2013, 110200, 'Mati', 'Varian Highway Star, Harga lebih ekonomis karena status pajak mati, sangat cocok untuk pembeli yang berniat melakukan balik nama langsung.', '69ef581849e90.jpg'),
+(12, 'Toyota Fortuner GR Sport', 'Toyota', 510000000, 2022, 34000, 'Hidup', 'Kondisi super istimewa (Like New). Pajak hidup, record servis dealer resmi lengkap, bodi mulus tanpa lecet, dan interior masih tercium aroma mobil baru.', '69ef58a33871f.jpg'),
+(13, 'Honda CR-V Gen 2', 'Honda', 80000000, 2005, 185000, 'Mati', 'SUV legendaris yang tangguh. Meskipun pajak mati dan kilometer sudah tinggi, kaki-kaki masih cukup nyaman. Harga disesuaikan agar terjangkau bagi pemula.', '69ef591c13c67.jpg'),
+(14, 'Toyota Camry', 'Toyota', 120000000, 2010, 140000, 'Hidup', 'Menawarkan kenyamanan sedan kelas pejabat. Pajak hidup terjamin, mesin halus tanpa rembesan oli, dan semua fitur elektrikal kabin berfungsi dengan normal.', '69ef59a654a5a.jpg'),
+(15, 'Nissan Grand Livina', 'Nissan', 98000000, 2013, 125400, 'Hidup', 'Varian SV Facelift dengan tampilan elegan warna hitam solid. Kondisi bodi sangat rapi, pajak hidup panjang (09.29), dan mesin tergolong sehat. Cocok untuk mobil operasional keluarga dengan harga di bawah 100 juta.', '69ef6432ec33e.jpg'),
+(16, 'Honda Freed', 'Honda', 142000000, 2010, 115000, 'Hidup', 'Tipe PSD dengan pintu geser otomatis kiri-kanan berfungsi normal. Interior captain seat yang nyaman, pajak hidup (06.30), dan bodi abu-abu metalik yang masih orisinal.', '69ef64d548bd4.jpg'),
+(17, 'Nissan X-Trail T30', 'Nissan', 75000000, 2007, 168000, 'Hidup', 'SUV tangguh dengan kenyamanan khas Nissan. Pajak hidup (10.29), bodi terlihat kokoh meskipun ada pemakaian wajar. Sangat bertenaga untuk penggunaan luar kota.', '69ef6d44143f9.jpg'),
+(18, 'Chevrolet Sonic/Aveo', 'Chevrolet', 89000000, 2012, 98600, 'Hidup', 'Pajak hidup (08.28), bodi hitam mulus, dan interior yang kedap suara. Pilihan bagi yang mencari mobil kompak non-mainstream.', '69ef6b67d2914.jpg'),
+(19, 'Nissan X-Trail T31', 'Nissan', 118000000, 2011, 132000, 'Mati', 'Generasi T31 yang lebih modern dengan bagasi laci fungsional. Kondisi mesin halus, namun pajak mati. Unit sangat stabil dan nyaman dikendarai di berbagai medan.', '69ef6cf456656.jpg'),
+(20, 'Daihatsu Xenia', 'Daihatsu', 105000000, 2014, 108000, 'Hidup', 'Mobil sejuta umat yang ekonomis. Pajak hidup, bodi perak metalik, perawatan sangat mudah dan murah.', '69ef6f3f7ac32.jpg'),
+(21, 'Honda Jazz', 'Honda', 78000000, 2006, 155000, 'Mati', 'Warna kuning mencolok, mesin VTEC responsif, bodi rapi. Harga ekonomis menyesuaikan status pajak.', '69ef6fc91e366.jpg'),
+(22, 'Nissan X-Trail T31 - Merah', 'Nissan', 115000000, 2011, 135000, 'Hidup', 'SUV tangguh dengan warna merah yang jarang ada (rare). Dilengkapi aksesori lampu atap orisinal, bodi kekar, mesin bertenaga, dan pajak hidup (01.31). Sangat cocok untuk penggemar SUV bergaya petualang.', '69f056fa95a59.jpg'),
+(23, 'Nissan Serena C24 - Putih', 'Nissan', 90000000, 2010, 145000, 'Hidup', 'Tipe Highway Star dengan pintu geser elektrik, interior mewah, pajak hidup (10.28), dan bodi putih mulus. Pilihan keluarga yang mengutamakan kenyamanan kabin.', '69f060fbd7004.jpg'),
+(24, 'Ford EcoSport', 'Ford', 105000000, 2014, 98000, 'Hidup', 'Compact SUV dengan fitur melimpah di kelasnya. Varian tertinggi (Titanium) dengan ban cadangan \"konde\" di belakang, bodi rapi, pajak hidup (03.30), dan fitur sunroof orisinal yang masih berfungsi baik', '69f061ecd2fb1.jpg'),
+(25, 'Nissan Grand Livina Facelift - Perak', 'Nissan', 110000000, 2012, 112000, 'Hidup', 'Model facelift dengan transmisi X-Tronic CVT yang halus. Warna perak metalik, bodi orisinal, interior rapi, dan pajak hidup (07.29). Mobil keluarga yang stabil dan irit bahan bakar.', '69f0627276b44.jpg'),
+(26, 'Wuling Cortez - Cokelat', 'Wuling', 145000000, 2018, 75000, 'Hidup', 'MPV modern dengan fitur kelas atas. Kondisi bodi sangat mulus, kilometer tergolong rendah untuk tahunnya, dan pajak hidup (01.30)', '69f0655c75de4.jpg'),
+(27, 'Mazda 2 R (SkyActiv)', 'Mazda', 165000000, 2013, 82000, 'Hidup', 'Hatchback premium dengan teknologi SkyActiv dan warna Soul Red khas Mazda. Kondisi sangat terawat, cat orisinal, interior mewah dengan fitur modern, dan pajak hidup (01.27).', '69f068841f681.jpg'),
+(28, 'Mitsubishi Pajero Sport', 'Mitsubishi', 460000000, 2016, 75000, 'Hidup', 'Kondisi bodi putih mulus, mesin diesel bertenaga, fitur keamanan aktif lengkap, dan pajak hidup (09.29). Unit tangguh yang siap digunakan di segala medan.', '69f068e1a425f.jpg'),
+(29, 'Honda CR-V Gen 2', 'Honda', 95000000, 2005, 174998, 'Hidup', 'Unit modifikasi eye-catching dengan cat bunglon (Chameleon Paint) hijau-ungu, pajak hidup (08.29), dan mesin 2.400cc yang responsif. Pilihan menarik bagi pecinta SUV yang ingin tampil beda.', '69f069d52be7f.jpg');
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `tb_kriteria`
--- Sesuai Proposal Skripsi: 7 Kriteria
 --
 
 CREATE TABLE `tb_kriteria` (
@@ -46,97 +99,179 @@ CREATE TABLE `tb_kriteria` (
   `nama_kriteria` varchar(100) NOT NULL,
   `atribut` enum('benefit','cost') NOT NULL,
   `bobot` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_kriteria`
--- Bobot awal diset rata/dummy, nanti bisa diedit di halaman Admin
 --
 
 INSERT INTO `tb_kriteria` (`id_kriteria`, `kode_kriteria`, `nama_kriteria`, `atribut`, `bobot`) VALUES
-(1, 'C1', 'Harga', 'cost', 0.25),
-(2, 'C2', 'Kondisi Mesin', 'benefit', 0.15),
-(3, 'C3', 'Kondisi Bodi', 'benefit', 0.10),
-(4, 'C4', 'Tahun Produksi', 'benefit', 0.15),
-(5, 'C5', 'Jarak Tempuh (KM)', 'cost', 0.15),
-(6, 'C6', 'Kelengkapan Surat', 'benefit', 0.10),
-(7, 'C7', 'Jenis Transmisi', 'benefit', 0.10);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tb_alternatif`
--- Tabel ini menyimpan data Mobil Bekas (Stok Showroom)
---
-
-CREATE TABLE `tb_alternatif` (
-  `id_mobil` int(11) NOT NULL,
-  `nama_mobil` varchar(100) NOT NULL,
-  `merek` varchar(50) NOT NULL,
-  `harga_asli` double NOT NULL,
-  `tahun` int(4) NOT NULL,
-  `jarak_tempuh` int(11) NOT NULL,
-  `transmisi` enum('Manual','Matic') NOT NULL,
-  `deskripsi` text NOT NULL,
-  `foto_mobil` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `tb_alternatif` (Data Dummy untuk Test)
---
-
-INSERT INTO `tb_alternatif` (`id_mobil`, `nama_mobil`, `merek`, `harga_asli`, `tahun`, `jarak_tempuh`, `transmisi`, `deskripsi`, `foto_mobil`) VALUES
-(1, 'Toyota Avanza G', 'Toyota', 120000000, 2018, 50000, 'Manual', 'Kondisi mulus, pajak hidup.', 'avanza.jpg'),
-(2, 'Honda Jazz RS', 'Honda', 180000000, 2019, 35000, 'Matic', 'Siap pakai, service record rutin.', 'jazz.jpg'),
-(3, 'Daihatsu Xenia Xi', 'Daihatsu', 95000000, 2015, 80000, 'Manual', 'Mesin kering, kaki-kaki empuk.', 'xenia.jpg');
+(1, 'C1', 'Harga', 'cost', 0.16),
+(2, 'C2', 'Kondisi Mesin', 'benefit', 0.13),
+(3, 'C3', 'Kondisi Bodi', 'benefit', 0.13),
+(4, 'C4', 'Tahun Produksi', 'benefit', 0.16),
+(5, 'C5', 'Jarak Tempuh (KM)', 'cost', 0.1),
+(6, 'C6', 'Kelengkapan Surat', 'benefit', 0.16),
+(7, 'C7', 'Pajak Kendaraan', 'benefit', 0.16);
 
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `tb_penilaian`
--- Tabel ini menyimpan Nilai Konversi untuk perhitungan MOORA
--- Menghubungkan Mobil (Alternatif) dengan Kriteria
 --
 
 CREATE TABLE `tb_penilaian` (
   `id_penilaian` int(11) NOT NULL,
   `id_mobil` int(11) NOT NULL,
   `id_kriteria` int(11) NOT NULL,
-  `nilai` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `nilai` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_penilaian`
--- Contoh penilaian untuk 3 mobil di atas terhadap 7 kriteria
 --
 
 INSERT INTO `tb_penilaian` (`id_penilaian`, `id_mobil`, `id_kriteria`, `nilai`) VALUES
--- Nilai Toyota Avanza (ID 1)
-(1, 1, 1, 120000000), -- C1 Harga
-(2, 1, 2, 4),         -- C2 Mesin (Skala 1-5, misal 4=Baik)
-(3, 1, 3, 4),         -- C3 Bodi
-(4, 1, 4, 2018),      -- C4 Tahun
-(5, 1, 5, 50000),     -- C5 KM
-(6, 1, 6, 5),         -- C6 Surat (5=Lengkap)
-(7, 1, 7, 3),         -- C7 Transmisi (3=Manual, asumsi Matic=5)
-
--- Nilai Honda Jazz (ID 2)
-(8, 2, 1, 180000000),
-(9, 2, 2, 5),
-(10, 2, 3, 5),
-(11, 2, 4, 2019),
-(12, 2, 5, 35000),
-(13, 2, 6, 5),
-(14, 2, 7, 5),        -- Matic diberi nilai 5
-
--- Nilai Daihatsu Xenia (ID 3)
-(15, 3, 1, 95000000),
-(16, 3, 2, 3),
-(17, 3, 3, 3),
-(18, 3, 4, 2015),
-(19, 3, 5, 80000),
-(20, 3, 6, 4),
-(21, 3, 7, 3);
+(64, 10, 1, 115000000),
+(65, 10, 2, 4),
+(66, 10, 3, 4),
+(67, 10, 4, 2014),
+(68, 10, 5, 92500),
+(69, 10, 6, 5),
+(70, 10, 7, 5),
+(71, 11, 1, 135000000),
+(72, 11, 2, 3),
+(73, 11, 3, 4),
+(74, 11, 4, 2013),
+(75, 11, 5, 110200),
+(76, 11, 6, 5),
+(77, 11, 7, 3),
+(78, 12, 1, 510000000),
+(79, 12, 2, 5),
+(80, 12, 3, 5),
+(81, 12, 4, 2022),
+(82, 12, 5, 34000),
+(83, 12, 6, 1),
+(84, 12, 7, 5),
+(85, 13, 1, 80000000),
+(86, 13, 2, 3),
+(87, 13, 3, 3),
+(88, 13, 4, 2005),
+(89, 13, 5, 185000),
+(90, 13, 6, 4),
+(91, 13, 7, 3),
+(92, 14, 1, 120000000),
+(93, 14, 2, 4),
+(94, 14, 3, 3),
+(95, 14, 4, 2010),
+(96, 14, 5, 140000),
+(97, 14, 6, 5),
+(98, 14, 7, 5),
+(99, 15, 1, 98000000),
+(100, 15, 2, 4),
+(101, 15, 3, 4),
+(102, 15, 4, 2013),
+(103, 15, 5, 125400),
+(104, 15, 6, 5),
+(105, 15, 7, 5),
+(106, 16, 1, 142000000),
+(107, 16, 2, 4),
+(108, 16, 3, 4),
+(109, 16, 4, 2010),
+(110, 16, 5, 115000),
+(111, 16, 6, 5),
+(112, 16, 7, 5),
+(113, 17, 1, 75000000),
+(114, 17, 2, 3),
+(115, 17, 3, 3),
+(116, 17, 4, 2007),
+(117, 17, 5, 168000),
+(118, 17, 6, 5),
+(119, 17, 7, 5),
+(120, 18, 1, 89000000),
+(121, 18, 2, 4),
+(122, 18, 3, 4),
+(123, 18, 4, 2012),
+(124, 18, 5, 98600),
+(125, 18, 6, 5),
+(126, 18, 7, 5),
+(127, 19, 1, 118000000),
+(128, 19, 2, 4),
+(129, 19, 3, 4),
+(130, 19, 4, 2011),
+(131, 19, 5, 132000),
+(132, 19, 6, 5),
+(133, 19, 7, 3),
+(134, 20, 1, 105000000),
+(135, 20, 2, 4),
+(136, 20, 3, 3),
+(137, 20, 4, 2014),
+(138, 20, 5, 108000),
+(139, 20, 6, 5),
+(140, 20, 7, 5),
+(141, 21, 1, 78000000),
+(142, 21, 2, 3),
+(143, 21, 3, 4),
+(144, 21, 4, 2006),
+(145, 21, 5, 155000),
+(146, 21, 6, 4),
+(147, 21, 7, 3),
+(148, 22, 1, 115000000),
+(149, 22, 2, 4),
+(150, 22, 3, 4),
+(151, 22, 4, 2011),
+(152, 22, 5, 135000),
+(153, 22, 6, 5),
+(154, 22, 7, 5),
+(155, 23, 1, 90000000),
+(156, 23, 2, 3),
+(157, 23, 3, 4),
+(158, 23, 4, 2010),
+(159, 23, 5, 145000),
+(160, 23, 6, 5),
+(161, 23, 7, 5),
+(162, 24, 1, 105000000),
+(163, 24, 2, 4),
+(164, 24, 3, 4),
+(165, 24, 4, 2014),
+(166, 24, 5, 98000),
+(167, 24, 6, 5),
+(168, 24, 7, 5),
+(169, 25, 1, 110000000),
+(170, 25, 2, 4),
+(171, 25, 3, 4),
+(172, 25, 4, 2012),
+(173, 25, 5, 111998),
+(174, 25, 6, 5),
+(175, 25, 7, 5),
+(176, 26, 1, 145000000),
+(177, 26, 2, 4),
+(178, 26, 3, 5),
+(179, 26, 4, 2018),
+(180, 26, 5, 75000),
+(181, 26, 6, 5),
+(182, 26, 7, 5),
+(183, 27, 1, 165000000),
+(184, 27, 2, 5),
+(185, 27, 3, 5),
+(186, 27, 4, 2013),
+(187, 27, 5, 82000),
+(188, 27, 6, 5),
+(189, 27, 7, 5),
+(190, 28, 1, 460000000),
+(191, 28, 2, 5),
+(192, 28, 3, 5),
+(193, 28, 4, 2016),
+(194, 28, 5, 75000),
+(195, 28, 6, 5),
+(196, 28, 7, 5),
+(197, 29, 1, 95000000),
+(198, 29, 2, 3),
+(199, 29, 3, 4),
+(200, 29, 4, 2005),
+(201, 29, 5, 174998),
+(202, 29, 6, 5),
+(203, 29, 7, 5);
 
 --
 -- Indexes for dumped tables
@@ -149,16 +284,16 @@ ALTER TABLE `tb_admin`
   ADD PRIMARY KEY (`id_admin`);
 
 --
--- Indexes for table `tb_kriteria`
---
-ALTER TABLE `tb_kriteria`
-  ADD PRIMARY KEY (`id_kriteria`);
-
---
 -- Indexes for table `tb_alternatif`
 --
 ALTER TABLE `tb_alternatif`
   ADD PRIMARY KEY (`id_mobil`);
+
+--
+-- Indexes for table `tb_kriteria`
+--
+ALTER TABLE `tb_kriteria`
+  ADD PRIMARY KEY (`id_kriteria`);
 
 --
 -- Indexes for table `tb_penilaian`
@@ -176,7 +311,13 @@ ALTER TABLE `tb_penilaian`
 -- AUTO_INCREMENT for table `tb_admin`
 --
 ALTER TABLE `tb_admin`
-  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_admin` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tb_alternatif`
+--
+ALTER TABLE `tb_alternatif`
+  MODIFY `id_mobil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `tb_kriteria`
@@ -185,16 +326,10 @@ ALTER TABLE `tb_kriteria`
   MODIFY `id_kriteria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `tb_alternatif`
---
-ALTER TABLE `tb_alternatif`
-  MODIFY `id_mobil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT for table `tb_penilaian`
 --
 ALTER TABLE `tb_penilaian`
-  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
 
 --
 -- Constraints for dumped tables
@@ -206,5 +341,8 @@ ALTER TABLE `tb_penilaian`
 ALTER TABLE `tb_penilaian`
   ADD CONSTRAINT `tb_penilaian_ibfk_1` FOREIGN KEY (`id_mobil`) REFERENCES `tb_alternatif` (`id_mobil`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `tb_penilaian_ibfk_2` FOREIGN KEY (`id_kriteria`) REFERENCES `tb_kriteria` (`id_kriteria`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -21,8 +21,8 @@
             </div>
             <div class="col-md-4 mb-4">
                 <h5 class="fw-bold text-uppercase mb-3">Kontak Kami</h5>
-                <p class="small text-secondary mb-1"><i class="bi bi-geo-alt-fill"></i> Jl. Raya Pamulang No. 12, Tangerang Selatan</p>
-                <p class="small text-secondary mb-1"><i class="bi bi-whatsapp"></i> +62 812-3456-7890</p>
+                <p class="small text-secondary mb-1"><i class="bi bi-geo-alt-fill"></i> Jl. Raya KSU No. 52, Tirtajaya, Kec. Sukmajaya, Kota Depok, Jawa Barat</p>
+                <p class="small text-secondary mb-1"><i class="bi bi-whatsapp"></i> +62 813 1409 0617</p>
                 <p class="small text-secondary"><i class="bi bi-envelope"></i> info@sadulurmobilindo.com</p>
             </div>
         </div>

@@ -3,6 +3,15 @@ include 'header.php';
 
 // LOGIKA UPDATE DATA
 if (isset($_POST['simpan_kriteria'])) {
+    // Cek Keamanan: Hanya admin yang boleh edit
+    if ($_SESSION['role'] !== 'admin') {
+        echo "<script>
+                alert('Akses Ditolak! Owner hanya dapat melihat data.');
+                document.location.href = 'data_kriteria.php';
+              </script>";
+        exit;
+    }
+
     if (ubahKriteria($_POST) > 0) {
         echo "<script>
                 alert('Kriteria berhasil diupdate!');
@@ -21,8 +30,13 @@ $mode_edit = false;
 $kriteria_edit = null;
 
 if (isset($_GET['aksi']) && $_GET['aksi'] == 'edit' && isset($_GET['id'])) {
-    $mode_edit = true;
-    $kriteria_edit = cariKriteria($_GET['id']);
+    // Hanya admin yang bisa masuk mode edit
+    if ($_SESSION['role'] === 'admin') {
+        $mode_edit = true;
+        $kriteria_edit = cariKriteria($_GET['id']);
+    } else {
+        echo "<script>alert('Akses Ditolak! Anda tidak memiliki izin untuk mengedit.');</script>";
+    }
 }
 
 // Ambil semua data kriteria
@@ -73,9 +87,13 @@ $kriteria = query("SELECT * FROM tb_kriteria ORDER BY id_kriteria ASC");
                             </td>
                             <td><?= $k['bobot']; ?></td>
                             <td class="text-center">
+                                <?php if ($_SESSION['role'] === 'admin') : ?>
                                 <a href="data_kriteria.php?aksi=edit&id=<?= $k['id_kriteria']; ?>" class="btn btn-sm btn-warning text-white">
                                     <i class="bi bi-pencil-square"></i> Edit
                                 </a>
+                                <?php else : ?>
+                                    <span class="badge bg-secondary">View Only</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

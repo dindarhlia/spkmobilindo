@@ -37,6 +37,7 @@ if (isset($_POST['login'])) {
         $_SESSION['status_login'] = true;
         $_SESSION['id_admin'] = $row['id_admin'];
         $_SESSION['nama_admin'] = $row['nama_lengkap'];
+        $_SESSION['role'] = $row['role'];
         
         // Redirect ke Dashboard
         echo "<script>

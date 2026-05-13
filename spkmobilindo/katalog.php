@@ -4,7 +4,7 @@ include 'header.php';
 
 // Logika Pencarian
 if (isset($_POST['cari'])) {
-    $keyword = $_POST['keyword'];
+    $keyword = mysqli_real_escape_string($conn, $_POST['keyword']);
     // Cari berdasarkan nama mobil atau merek
     $query = "SELECT * FROM tb_alternatif WHERE 
               nama_mobil LIKE '%$keyword%' OR 
@@ -39,7 +39,7 @@ if (isset($_POST['cari'])) {
     <div class="row">
         <?php if(empty($mobil)) : ?>
             <div class="col-12 text-center py-5">
-                <img src="assets/img/empty.svg" alt="" width="150" class="mb-3 opacity-50"> <h4 class="text-muted">Mobil tidak ditemukan.</h4>
+                <h4 class="text-muted">Mobil tidak ditemukan.</h4>
                 <p>Coba kata kunci lain atau hubungi admin.</p>
                 <a href="katalog.php" class="btn btn-outline-primary mt-2">Reset Pencarian</a>
             </div>
@@ -47,8 +47,8 @@ if (isset($_POST['cari'])) {
             
             <?php foreach($mobil as $m) : ?>
             <div class="col-md-4 mb-4">
-                <div class="card card-mobil h-100 border-0 shadow-sm">
-                    <div class="position-absolute top-0 end-0 bg-warning text-dark fw-bold px-3 py-1 rounded-bottom-start shadow-sm">
+                <div class="card card-mobil h-100 border-0 shadow-sm overflow-hidden">
+                    <div class="position-absolute top-0 end-0 bg-warning text-dark fw-bold px-3 py-1 rounded-bottom-start shadow-sm" style="z-index: 1;">
                         <?= $m['tahun']; ?>
                     </div>
 
@@ -62,10 +62,15 @@ if (isset($_POST['cari'])) {
                         
                         <div class="row small text-secondary mb-3">
                             <div class="col-6 border-end">
-                                <i class="bi bi-speedometer2 me-1"></i> <?= number_format($m['jarak_tempuh']); ?> KM
+                                <i class="bi bi-speedometer2 me-1"></i> <?= number_format($m['jarak_tempuh'], 0, ',', '.'); ?> KM
                             </div>
                             <div class="col-6 ps-3">
-                                <i class="bi bi-gear-wide-connected me-1"></i> <?= $m['transmisi']; ?>
+                                <i class="bi bi-calendar-check me-1"></i> Pajak: 
+                                <?php if($m['pajak_kendaraan'] == 'Hidup') : ?>
+                                    <span class="text-success fw-bold">Hidup</span>
+                                <?php else : ?>
+                                    <span class="text-danger fw-bold">Mati</span>
+                                <?php endif; ?>
                             </div>
                         </div>
 

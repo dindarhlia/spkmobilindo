@@ -1,73 +1,89 @@
-<?php
-// Include Header (Sudah ada session start & functions)
-include 'header.php';
+<?php 
+session_start();
+require '../config/functions.php';
 
-// Logika Hapus Data
-if (isset($_GET['aksi']) && $_GET['aksi'] == 'hapus' && isset($_GET['id'])) {
+if (!isset($_SESSION['status_login'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// ==========================================
+// LOGIKA OPSI B: PROSES HAPUS DATA
+// ==========================================
+if (isset($_GET['aksi']) && $_GET['aksi'] == 'hapus') {
     $id_hapus = $_GET['id'];
+    
     if (hapusMobil($id_hapus) > 0) {
         echo "<script>
                 alert('Data mobil berhasil dihapus!');
                 document.location.href = 'data_mobil.php';
               </script>";
     } else {
-        echo "<script>alert('Gagal menghapus data.');</script>";
+        echo "<script>
+                alert('Gagal menghapus data!');
+                document.location.href = 'data_mobil.php';
+              </script>";
     }
 }
 
-// Ambil semua data mobil
-$mobil = query("SELECT * FROM tb_alternatif ORDER BY id_mobil DESC");
+// Ambil data mobil terbaru untuk ditampilkan di tabel
+$mobil = query("SELECT * FROM tb_alternatif");
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3><i class="bi bi-car-front-fill me-2"></i> Data Mobil Bekas</h3>
-    <a href="form_mobil.php" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Tambah Mobil</a>
-</div>
+<?php include 'header.php'; ?>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Data Mobil</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
+        <li class="breadcrumb-item active">Data Mobil</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <a href="form_mobil.php" class="btn btn-primary btn-sm">Tambah Mobil</a>
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple" class="table table-striped table-bordered">
+                <thead>
                     <tr>
                         <th>No</th>
                         <th>Foto</th>
                         <th>Nama Mobil</th>
-                        <th>Tahun</th>
-                        <th>Transmisi</th>
+                        <th>Merek</th>
                         <th>Harga</th>
+                        <th>Tahun</th>
+                        <th>KM</th>
+                        <th>Pajak</th> 
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 1; foreach ($mobil as $m) : ?>
+                    <?php $no = 1; foreach($mobil as $m) : ?>
                     <tr>
-                        <td><?= $i++; ?></td>
+                        <td><?= $no++; ?></td>
                         <td>
-                            <img src="../foto_mobil/<?= $m['foto_mobil']; ?>" width="80" height="50" style="object-fit: cover; border-radius: 5px;">
+                            <img src="../foto_mobil/<?= $m['foto_mobil']; ?>" width="100" class="img-thumbnail">
                         </td>
-                        <td class="fw-bold"><?= $m['nama_mobil']; ?> <br> <small class="text-muted"><?= $m['merek']; ?></small></td>
+                        <td><?= $m['nama_mobil']; ?></td>
+                        <td><?= $m['merek']; ?></td>
+                        <td>Rp <?= number_format($m['harga_asli'], 0, ',', '.'); ?></td>
                         <td><?= $m['tahun']; ?></td>
+                        <td><?= number_format($m['jarak_tempuh'], 0, ',', '.'); ?> km</td>
                         <td>
-                            <?php if($m['transmisi'] == 'Matic'): ?>
-                                <span class="badge bg-info text-dark">Matic</span>
-                            <?php else: ?>
-                                <span class="badge bg-warning text-dark">Manual</span>
-                            <?php endif; ?>
+                            <span class="badge <?= ($m['pajak_kendaraan'] == 'Hidup') ? 'bg-success' : 'bg-danger'; ?>">
+                                <?= $m['pajak_kendaraan']; ?>
+                            </span>
                         </td>
-                        <td class="fw-bold text-primary">Rp <?= number_format($m['harga_asli'], 0, ',', '.'); ?></td>
                         <td>
-                            <a href="form_mobil.php?id=<?= $m['id_mobil']; ?>" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-square"></i></a>
-                            <a href="data_mobil.php?aksi=hapus&id=<?= $m['id_mobil']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus data ini?');"><i class="bi bi-trash"></i></a>
+                            <a href="form_mobil.php?id=<?= $m['id_mobil']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                            
+                            <a href="data_mobil.php?aksi=hapus&id=<?= $m['id_mobil']; ?>" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Yakin hapus data ini?')">Hapus</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
-                    
-                    <?php if(empty($mobil)) : ?>
-                    <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">Belum ada data mobil. Silakan tambah data.</td>
-                    </tr>
-                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

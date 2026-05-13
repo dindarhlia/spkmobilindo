@@ -1,29 +1,37 @@
-<?php
+<?php 
 // File: admin/laporan_cetak.php
 session_start();
-require '../config/functions.php'; // Ambil data dan fungsi
+require '../config/functions.php'; 
 
-// Cek Login (Security)
+// Set Zona Waktu ke WIB
+date_default_timezone_set('Asia/Jakarta');
+
 if (!isset($_SESSION['status_login'])) {
     header("Location: login.php");
     exit;
 }
 
+$merek_filter = isset($_GET['merek']) ? $_GET['merek'] : '';
+
 // Ambil Data Hasil Perhitungan MOORA
 $hasil = hitungMOORA();
 $ranking = $hasil['ranking'];
 
-// Ambil Tanggal Hari ini untuk Tanda Tangan
-$tanggal_cetak = date("d F Y");
+if ($merek_filter != '') {
+    $ranking = array_filter($ranking, function($item) use ($merek_filter) {
+        return strtolower($item['data']['merek'] ?? '') == strtolower($merek_filter);
+    });
+}
 
-// Array Bulan Indo untuk konversi tanggal (Opsional agar lebih formal)
+// Konversi Tanggal ke Bahasa Indonesia
 $bulanIndo = [
     'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
     'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
     'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
     'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
 ];
-$tanggal_cetak = strtr($tanggal_cetak, $bulanIndo);
+$tanggal_cetak = strtr(date("d F Y"), $bulanIndo);
+$waktu_cetak = date("H:i");
 ?>
 
 <!DOCTYPE html>
@@ -32,24 +40,22 @@ $tanggal_cetak = strtr($tanggal_cetak, $bulanIndo);
     <meta charset="UTF-8">
     <title>Cetak Laporan SPK - Sadulur Mobilindo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <style>
-        /* Styling Khusus untuk Cetak (Kertas A4) */
         body {
             font-family: "Times New Roman", Times, serif;
             padding: 40px;
+            background-color: white;
         }
         .header-laporan {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 3px double black; /* Garis bawah kop surat */
+            border-bottom: 3px double black; 
             padding-bottom: 20px;
         }
         .judul-showroom {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             text-transform: uppercase;
-            margin-bottom: 5px;
         }
         .alamat-showroom {
             font-size: 14px;
@@ -58,8 +64,18 @@ $tanggal_cetak = strtr($tanggal_cetak, $bulanIndo);
             text-align: center;
             font-weight: bold;
             font-size: 18px;
-            margin-bottom: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
             text-decoration: underline;
+        }
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+            border-color: black !important;
+        }
+        .table tbody td {
+            vertical-align: middle;
+            border-color: black !important;
         }
         .ttd-area {
             float: right;
@@ -67,79 +83,77 @@ $tanggal_cetak = strtr($tanggal_cetak, $bulanIndo);
             text-align: center;
             margin-top: 50px;
         }
-        
-        /* CSS agar tombol print hilang saat dicetak kertas */
         @media print {
-            .no-print {
-                display: none !important;
-            }
+            .no-print { display: none !important; }
+            body { padding: 0; }
         }
     </style>
 </head>
-
 <body onload="window.print()">
 
-    <div class="no-print mb-4">
-        <a href="index.php" class="btn btn-secondary">← Kembali ke Dashboard</a>
+    <div class="no-print mb-4 d-flex justify-content-between">
+        <a href="index.php" class="btn btn-secondary">← Kembali</a>
         <button onclick="window.print()" class="btn btn-primary">🖨️ Cetak Laporan</button>
     </div>
 
     <div class="header-laporan">
         <div class="judul-showroom">SADULUR MOBILINDO</div>
         <div class="alamat-showroom">
-            Jl. Raya Pamulang No. 12, Tangerang Selatan, Banten<br>
-            Telp: +62 812-3456-7890 | Email: info@sadulurmobilindo.com
+            Jl. Raya KSU No. 52, Tirtajaya, Kec. Sukmajaya, Kota Depok, Jawa Barat<br>
+            Telp: +62 813 1409 0617 | Email: info@sadulurmobilindo.com
         </div>
     </div>
 
     <div class="judul-dokumen">
         LAPORAN HASIL REKOMENDASI MOBIL BEKAS (METODE MOORA)
     </div>
-
-    <p>Berikut adalah hasil perhitungan sistem pendukung keputusan pemilihan mobil bekas terbaik berdasarkan kriteria yang telah ditetapkan (Harga, Tahun, Kondisi, dll):</p>
+    
+    <div class="mb-4">
+        <table class="table table-sm table-borderless w-50" style="font-size: 14px;">
+            <tr>
+                <td width="30%">Filter Merek</td>
+                <td>: <?= ($merek_filter == '') ? 'Semua Merek' : strtoupper($merek_filter); ?></td>
+            </tr>
+            <tr>
+                <td>Waktu Cetak</td>
+                <td>: <?= $tanggal_cetak; ?> | <?= $waktu_cetak; ?> WIB</td>
+            </tr>
+        </table>
+    </div>
 
     <table class="table table-bordered border-dark">
-        <thead class="table-light border-dark text-center">
+        <thead class="text-center">
             <tr>
-                <th width="5%">Peringkat</th>
-                <th width="35%">Nama Mobil</th>
-                <th width="25%">Merek & Tahun</th>
-                <th width="20%">Nilai Optimasi (Yi)</th>
-                <th width="15%">Keterangan</th>
+                <th width="50">No</th>
+                <th>Nama Mobil</th>
+                <th>Merek</th>
+                <th>Tahun</th>
+                <th>Harga</th>
+                <th>Nilai Optimasi (Yi)</th>
             </tr>
         </thead>
         <tbody>
             <?php if(empty($ranking)): ?>
-                <tr>
-                    <td colspan="5" class="text-center">Belum ada data mobil yang dihitung.</td>
-                </tr>
+                <tr><td colspan="6" class="text-center py-4">Data tidak ditemukan.</td></tr>
             <?php else: ?>
-                <?php $no = 1; foreach($ranking as $r): ?>
+                <?php $no = 1; foreach ($ranking as $r) : ?>
                 <tr>
-                    <td class="text-center fw-bold"><?= $no; ?></td>
+                    <td class="text-center"><?= $no++; ?></td>
                     <td><?= $r['nama_mobil']; ?></td>
-                    <td><?= $r['data']['merek'] ?? '-'; ?> (<?= $r['data']['tahun'] ?? '-'; ?>)</td>
+                    <td class="text-center"><?= $r['data']['merek'] ?? '-'; ?></td> 
+                    <td class="text-center"><?= $r['data']['tahun'] ?? '-'; ?></td>
+                    <td>Rp <?= number_format($r['harga'], 0, ',', '.'); ?></td>
                     <td class="text-center fw-bold"><?= number_format($r['nilai_akhir'], 6); ?></td>
-                    <td class="text-center">
-                        <?php if($no == 1): ?>
-                            <span class="badge border border-dark text-dark">Sangat Direkomendasikan</span>
-                        <?php elseif($no <= 3): ?>
-                            <span class="badge border border-dark text-dark">Direkomendasikan</span>
-                        <?php else: ?>
-                            -
-                        <?php endif; ?>
-                    </td>
                 </tr>
-                <?php $no++; endforeach; ?>
+                <?php endforeach; ?>
             <?php endif; ?>
         </tbody>
     </table>
 
     <div class="ttd-area">
-        <p>Tangerang Selatan, <?= $tanggal_cetak; ?></p>
-        <br><br><br>
-        <p><strong><u><?= $_SESSION['nama_admin']; ?></u></strong><br>
-        Administrator</p>
+        <p>Depok, <?= $tanggal_cetak; ?></p>
+        <br><br><br><br>
+        <p><strong><u><?= $_SESSION['nama_admin']; ?></u></strong></p>
     </div>
 
 </body>

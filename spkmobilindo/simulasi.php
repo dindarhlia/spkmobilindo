@@ -11,7 +11,6 @@ if (isset($_POST['hitung'])) {
     $is_submitted = true;
 
     // 1. Ambil Input Preferensi User (Skala 1-5)
-    // Kita konversi "Sangat Penting" jadi angka
     $bobot_input = [
         1 => $_POST['p_harga'],    // C1 (Cost)
         2 => $_POST['p_mesin'],    // C2 (Benefit)
@@ -19,12 +18,10 @@ if (isset($_POST['hitung'])) {
         4 => $_POST['p_tahun'],    // C4 (Benefit)
         5 => $_POST['p_km'],       // C5 (Cost)
         6 => $_POST['p_surat'],    // C6 (Benefit)
-        7 => $_POST['p_transmisi'] // C7 (Benefit)
+        7 => $_POST['p_pajak']     // C7 (Benefit) - Diperbarui dari transmisi ke pajak
     ];
 
-    // 2. Normalisasi Bobot Input User
-    // Masalah: User mungkin input semuanya "5" (Total 35). Rumus MOORA butuh total bobot = 1.
-    // Solusi: Kita bagi setiap bobot dengan Total Bobot Input.
+    // 2. Normalisasi Bobot Input User (Total bobot harus = 1)
     $total_bobot_input = array_sum($bobot_input);
     $bobot_baru = [];
     foreach ($bobot_input as $id_kriteria => $nilai) {
@@ -32,10 +29,6 @@ if (isset($_POST['hitung'])) {
     }
 
     // 3. Jalankan Logika MOORA (Versi Custom untuk Simulasi)
-    // Kita tidak bisa pakai fungsi hitungMOORA() di functions.php karena bobotnya beda.
-    // Jadi kita tulis ulang logika intinya di sini secara ringkas.
-
-    // A. Ambil Data Mobil & Penilaian
     $alternatif = query("SELECT * FROM tb_alternatif");
     $penilaian_db = query("SELECT * FROM tb_penilaian");
 
@@ -45,7 +38,7 @@ if (isset($_POST['hitung'])) {
         $matriks_x[$p['id_mobil']][$p['id_kriteria']] = $p['nilai'];
     }
 
-    // B. Hitung Pembagi (Akar Kuadrat) - Sama seperti standar
+    // B. Hitung Pembagi (Akar Kuadrat)
     $pembagi = [];
     for ($k=1; $k<=7; $k++) {
         $sum_kuadrat = 0;
@@ -62,9 +55,7 @@ if (isset($_POST['hitung'])) {
         $total_benefit = 0;
         $total_cost = 0;
 
-        // Loop 7 Kriteria
-        // Ingat: C1(Harga) & C5(KM) adalah COST. Sisanya BENEFIT.
-        // Cek atribut di database atau hardcode ID-nya karena strukturnya fix.
+        // C1(Harga) & C5(KM) adalah COST. Sisanya BENEFIT.
         $arr_cost = [1, 5]; 
 
         for ($k=1; $k<=7; $k++) {
@@ -129,7 +120,7 @@ if (isset($_POST['hitung'])) {
                             'p_tahun' => 'Tahun Pembuatan Muda',
                             'p_km' => 'KM Rendah',
                             'p_surat' => 'Kelengkapan Dokumen',
-                            'p_transmisi' => 'Jenis Transmisi (Matic)'
+                            'p_pajak' => 'Status Pajak Kendaraan (Hidup)' // Nama diperbarui
                         ];
                         ?>
 

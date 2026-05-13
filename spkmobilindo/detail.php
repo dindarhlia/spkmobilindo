@@ -6,17 +6,16 @@ include 'header.php';
 $id = $_GET['id'];
 
 // Query data mobil berdasarkan ID
-// Kita pakai fungsi query() dari functions.php lalu ambil index ke-0
+// Pastikan kolom pajak_kendaraan dipanggil (bukan transmisi)
 $data = query("SELECT * FROM tb_alternatif WHERE id_mobil = $id")[0];
 
-// Jika ID ngawur/tidak ditemukan, kembalikan ke katalog
+// Jika ID tidak ditemukan, kembalikan ke katalog
 if (!$data) {
     echo "<script>document.location.href = 'katalog.php';</script>";
     exit;
 }
 
-// Ambil Data Nilai Kriteria (Mesin, Bodi, Surat) untuk ditampilkan statusnya
-// Kita perlu query manual ke tb_penilaian agar bisa menampilkan label "Sangat Baik" dsb, bukan cuma angka
+// Ambil Data Nilai Kriteria dari tb_penilaian
 $nilai_mesin = query("SELECT nilai FROM tb_penilaian WHERE id_mobil = $id AND id_kriteria = 2")[0]['nilai'];
 $nilai_bodi = query("SELECT nilai FROM tb_penilaian WHERE id_mobil = $id AND id_kriteria = 3")[0]['nilai'];
 $nilai_surat = query("SELECT nilai FROM tb_penilaian WHERE id_mobil = $id AND id_kriteria = 6")[0]['nilai'];
@@ -44,7 +43,7 @@ function getLabelKualitas($angka) {
     <div class="row">
         <div class="col-md-7 mb-4">
             <div class="card border-0 shadow overflow-hidden rounded-3">
-                <img src="foto_mobil/<?= $data['foto_mobil']; ?>" class="img-fluid w-100" alt="<?= $data['nama_mobil']; ?>">
+                <img src="foto_mobil/<?= $data['foto_mobil']; ?>" class="img-fluid w-100" alt="<?= $data['nama_mobil']; ?>" style="object-fit: cover; max-height: 500px;">
             </div>
         </div>
 
@@ -54,17 +53,23 @@ function getLabelKualitas($angka) {
             
             <h1 class="text-primary fw-bold mb-4">Rp <?= number_format($data['harga_asli'], 0, ',', '.'); ?></h1>
 
-            <div class="card bg-light border-0 mb-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">Spesifikasi Utama</h6>
+            <div class="card bg-light border-0 mb-4 shadow-sm">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Spesifikasi Utama</h6>
                     <table class="table table-sm table-borderless mb-0">
                         <tr>
-                            <td class="text-secondary" width="40%">Jarak Tempuh</td>
-                            <td class="fw-bold">: <?= number_format($data['jarak_tempuh']); ?> km</td>
+                            <td class="text-secondary" width="45%">Jarak Tempuh</td>
+                            <td class="fw-bold">: <?= number_format($data['jarak_tempuh'], 0, ',', '.'); ?> km</td>
                         </tr>
                         <tr>
-                            <td class="text-secondary">Transmisi</td>
-                            <td class="fw-bold">: <?= $data['transmisi']; ?></td>
+                            <td class="text-secondary">Pajak Kendaraan</td>
+                            <td>: 
+                                <?php if($data['pajak_kendaraan'] == 'Hidup') : ?>
+                                    <span class="badge bg-success">Pajak Hidup</span>
+                                <?php else : ?>
+                                    <span class="badge bg-danger">Pajak Mati</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <tr>
                             <td class="text-secondary">Kondisi Mesin</td>
@@ -75,7 +80,7 @@ function getLabelKualitas($angka) {
                             <td class="fw-bold">: <?= getLabelKualitas($nilai_bodi); ?></td>
                         </tr>
                         <tr>
-                            <td class="text-secondary">Dokumen</td>
+                            <td class="text-secondary">Kelengkapan Dokumen</td>
                             <td class="fw-bold text-success">: <?= getLabelKualitas($nilai_surat); ?> <i class="bi bi-check-circle-fill"></i></td>
                         </tr>
                     </table>
@@ -84,13 +89,14 @@ function getLabelKualitas($angka) {
 
             <div class="mb-4">
                 <h6 class="fw-bold">Deskripsi Penjual:</h6>
-                <p class="text-secondary"><?= nl2br($data['deskripsi']); ?></p>
+                <p class="text-secondary" style="text-align: justify;"><?= nl2br($data['deskripsi']); ?></p>
             </div>
 
             <div class="d-grid gap-2">
                 <?php 
                     $pesan = "Halo Sadulur Mobilindo, saya tertarik dengan mobil " . $data['nama_mobil'] . " tahun " . $data['tahun'] . ". Apakah unit masih tersedia?";
-                    $linkWA = "https://wa.me/628872667070" . urlencode($pesan);
+                    // Perbaikan: Tambahkan ?text= agar pesan otomatis terisi di WA
+                    $linkWA = "https://wa.me/628872667070?text=" . urlencode($pesan);
                 ?>
                 <a href="<?= $linkWA; ?>" target="_blank" class="btn btn-success btn-lg">
                     <i class="bi bi-whatsapp me-2"></i> Hubungi via WhatsApp
