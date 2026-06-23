@@ -15,10 +15,53 @@ function query($query) {
     return $rows;
 }
 
-// Fungsi baru khusus untuk memastikan jarak tempuh (KM) benar-benar bulat
+// =========================================================================
+// MESIN KONVERSI OTOMATIS (Menerjemahkan Angka Riil ke Skala 1-5 MOORA)
+// Sesuai dengan Tabel 3.3 di Skripsi
+// =========================================================================
+
+function konversiNilaiHarga($harga) {
+    if ($harga < 100000000) return 1;
+    if ($harga >= 100000000 && $harga <= 149999999) return 2;
+    if ($harga >= 150000000 && $harga <= 299999999) return 3;
+    if ($harga >= 300000000 && $harga <= 400000000) return 4;
+    if ($harga > 400000000) return 5;
+    return 1; 
+}
+
+function konversiNilaiTahun($tahun) {
+    if ($tahun > 2018) return 5;
+    if ($tahun >= 2014 && $tahun <= 2018) return 4;
+    if ($tahun >= 2009 && $tahun <= 2013) return 3;
+    if ($tahun >= 2004 && $tahun <= 2008) return 2;
+    if ($tahun < 2004) return 1;
+    return 1;
+}
+
+function konversiNilaiKM($km) {
+    if ($km < 50000) return 1;
+    if ($km >= 50000 && $km <= 99999) return 2;
+    if ($km >= 100000 && $km <= 149999) return 3;
+    if ($km >= 150000 && $km <= 199999) return 4;
+    if ($km >= 200000) return 5;
+    return 5; 
+}
+
+function konversiNilaiPajak($status_pajak) {
+    if ($status_pajak == 'Hidup Panjang (> 6 Bulan)') return 5;
+    if ($status_pajak == 'Hidup Pendek (< 6 Bulan)') return 4;
+    if ($status_pajak == 'Telat / Mati 1 - 2 Tahun') return 3;
+    if ($status_pajak == 'Mati 3 - 4 Tahun') return 2;
+    if ($status_pajak == 'Mati > 4 Tahun') return 1;
+    return 3; 
+}
+
+// Fungsi bantu untuk memastikan KM murni angka integer
 function bersihkanAngkaKM($angka) {
     return intval(preg_replace("/[^0-9]/", "", $angka));
 }
+
+// =========================================================================
 
 function tambahMobil($data) {
     global $conn;
@@ -28,11 +71,9 @@ function tambahMobil($data) {
     $deskripsi  = mysqli_real_escape_string($conn, $data['deskripsi']);
     $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan']); 
     
-    // KEMBALIKAN KE FUNGSI AWAL UNTUK HARGA DAN TAHUN
+    // Data Riil untuk Tabel tb_alternatif
     $harga = htmlspecialchars($data['harga_asli']); 
     $tahun = htmlspecialchars($data['tahun']);
-    
-    // GUNAKAN FUNGSI BARU KHUSUS UNTUK JARAK TEMPUH (KM)
     $jarak = bersihkanAngkaKM($data['jarak_tempuh']); 
 
     $foto = upload();
@@ -44,15 +85,19 @@ function tambahMobil($data) {
     mysqli_query($conn, $query_mobil);
     $id_baru = mysqli_insert_id($conn);
 
-    // Simpan Nilai MOORA (Harga & Tahun pakai fungsi lama, KM pakai fungsi baru)
-    simpanNilai($id_baru, 1, $harga); 
+    // KEAJAIBAN BACKEND: Mencegat data riil dan Mengonversi ke skala 1-5
+    $nilai_harga = konversiNilaiHarga($harga);
+    $nilai_tahun = konversiNilaiTahun($tahun);
+    $nilai_jarak = konversiNilaiKM($jarak);
+    $nilai_pajak = konversiNilaiPajak($pajak);
+
+    // Simpan Angka Skala (1-5) ke Tabel tb_penilaian untuk Dihitung MOORA
+    simpanNilai($id_baru, 1, $nilai_harga); 
     simpanNilai($id_baru, 2, $data['kondisi_mesin']); 
     simpanNilai($id_baru, 3, $data['kondisi_bodi']);  
-    simpanNilai($id_baru, 4, $tahun); 
-    simpanNilai($id_baru, 5, $jarak); // Jarak tempuh dipastikan bulat
+    simpanNilai($id_baru, 4, $nilai_tahun); 
+    simpanNilai($id_baru, 5, $nilai_jarak); 
     simpanNilai($id_baru, 6, $data['kelengkapan_surat']); 
-    
-    $nilai_pajak = ($pajak == 'Hidup') ? 5 : 3;
     simpanNilai($id_baru, 7, $nilai_pajak); 
 
     return mysqli_affected_rows($conn);
@@ -68,11 +113,9 @@ function ubahMobil($data) {
     $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan']); 
     $gambarLama = $data['gambarLama'];
 
-    // KEMBALIKAN KE FUNGSI AWAL UNTUK HARGA DAN TAHUN
+    // Data Riil untuk Tabel tb_alternatif
     $harga = htmlspecialchars($data['harga_asli']);
     $tahun = htmlspecialchars($data['tahun']);
-    
-    // GUNAKAN FUNGSI BARU KHUSUS UNTUK JARAK TEMPUH (KM)
     $jarak = bersihkanAngkaKM($data['jarak_tempuh']);
 
     $foto = ($_FILES['foto']['error'] === 4) ? $gambarLama : upload();
@@ -90,15 +133,19 @@ function ubahMobil($data) {
     
     mysqli_query($conn, $query);
 
-    // Update Nilai MOORA (Harga & Tahun pakai fungsi lama, KM pakai fungsi baru)
-    updateNilai($id, 1, $harga);
+    // KEAJAIBAN BACKEND: Mencegat data riil dan Mengonversi ke skala 1-5
+    $nilai_harga = konversiNilaiHarga($harga);
+    $nilai_tahun = konversiNilaiTahun($tahun);
+    $nilai_jarak = konversiNilaiKM($jarak);
+    $nilai_pajak = konversiNilaiPajak($pajak);
+
+    // Update Angka Skala (1-5) ke Tabel tb_penilaian untuk Dihitung MOORA
+    updateNilai($id, 1, $nilai_harga);
     updateNilai($id, 2, $data['kondisi_mesin']);
     updateNilai($id, 3, $data['kondisi_bodi']);
-    updateNilai($id, 4, $tahun);
-    updateNilai($id, 5, $jarak); // Jarak tempuh dipastikan bulat
+    updateNilai($id, 4, $nilai_tahun);
+    updateNilai($id, 5, $nilai_jarak); 
     updateNilai($id, 6, $data['kelengkapan_surat']);
-    
-    $nilai_pajak = ($pajak == 'Hidup') ? 5 : 3;
     updateNilai($id, 7, $nilai_pajak);
 
     return true; 
@@ -150,6 +197,7 @@ function hitungMOORA() {
     $matriks_x = [];
     foreach ($alternatif as $alt) {
         $id_m = $alt['id_mobil'];
+        // Pada titik ini, data yang diambil dari tb_penilaian SUDAH berupa skala 1-5 berkat fungsi konversi di atas
         $penilaian = query("SELECT * FROM tb_penilaian WHERE id_mobil = $id_m");
         foreach ($penilaian as $val) {
             $matriks_x[$id_m][$val['id_kriteria']] = $val['nilai'];

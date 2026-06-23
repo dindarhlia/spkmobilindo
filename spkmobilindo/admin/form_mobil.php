@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
     $judul = "Ubah Data Mobil";
     $is_edit = true;
     $id_mobil = $_GET['id'];
-    $data = cariMobil($id_mobil); // Fungsi dari functions.php (yang baru ditambah)
+    $data = cariMobil($id_mobil); // Fungsi dari functions.php 
 } else {
     $judul = "Tambah Mobil Baru";
     $is_edit = false;
@@ -78,7 +78,7 @@ if (isset($_POST['submit'])) {
                     <h6 class="fw-bold text-secondary mb-3">Penilaian Kriteria (MOORA)</h6>
                     <div class="alert alert-info small py-2">
                         Isi penilaian kondisi secara objektif (Skala 1 - 5). <br>
-                        1 = Tidak Penting, 5 = Sangat Penting.
+                        1 = Sangat Kurang/Buruk, 5 = Sangat Baik/Sempurna.
                     </div>
 
                     <div class="row">
@@ -109,13 +109,17 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div class="mb-3">
-    <label class="form-label">Pajak Kendaraan</label>
-    <select name="pajak_kendaraan" class="form-select" required>
-        <option value="Hidup" <?= ($is_edit && $data['pajak_kendaraan'] == 'Hidup') ? 'selected' : ''; ?>>Pajak Hidup</option>
-        <option value="Mati" <?= ($is_edit && $data['pajak_kendaraan'] == 'Mati') ? 'selected' : ''; ?>>Pajak Mati</option>
-    </select>
-    <div class="form-text text-danger">*Pajak Hidup bernilai 5, Pajak Mati bernilai 3 (Otomatis)</div>
-</div>
+                        <label class="form-label">Pajak Kendaraan</label>
+                        <select name="pajak_kendaraan" class="form-select" required>
+                            <option value="" disabled <?= (!$is_edit) ? 'selected' : ''; ?>>-- Pilih Status Pajak --</option>
+                            <option value="Hidup Panjang (> 6 Bulan)" <?= ($is_edit && $data['pajak_kendaraan'] == 'Hidup Panjang (> 6 Bulan)') ? 'selected' : ''; ?>>Hidup Panjang (> 6 Bulan)</option>
+                            <option value="Hidup Pendek (< 6 Bulan)" <?= ($is_edit && $data['pajak_kendaraan'] == 'Hidup Pendek (< 6 Bulan)') ? 'selected' : ''; ?>>Hidup Pendek (< 6 Bulan)</option>
+                            <option value="Telat / Mati 1 - 2 Tahun" <?= ($is_edit && $data['pajak_kendaraan'] == 'Telat / Mati 1 - 2 Tahun') ? 'selected' : ''; ?>>Telat / Mati 1 - 2 Tahun</option>
+                            <option value="Mati 3 - 4 Tahun" <?= ($is_edit && $data['pajak_kendaraan'] == 'Mati 3 - 4 Tahun') ? 'selected' : ''; ?>>Mati 3 - 4 Tahun</option>
+                            <option value="Mati > 4 Tahun" <?= ($is_edit && $data['pajak_kendaraan'] == 'Mati > 4 Tahun') ? 'selected' : ''; ?>>Mati > 4 Tahun</option>
+                        </select>
+                        <div class="form-text text-danger">*Otomatis dikonversi menjadi bobot nilai 1 - 5 pada matriks penilaian MOORA.</div>
+                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Deskripsi Tambahan</label>
@@ -124,12 +128,37 @@ if (isset($_POST['submit'])) {
 
                     <div class="mb-4">
                         <label class="form-label">Foto Mobil</label>
-                        <?php if($is_edit): ?>
-                            <div class="mb-2">
-                                <img src="../foto_mobil/<?= $data['foto_mobil']; ?>" width="120" class="img-thumbnail">
+                        <?php if($is_edit && !empty($data['foto_mobil'])): ?>
+                            <div class="mb-3">
+                                <img src="../foto_mobil/<?= $data['foto_mobil']; ?>" 
+                                     width="120" 
+                                     class="img-thumbnail shadow-sm" 
+                                     style="cursor: pointer; transition: 0.3s;" 
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#modalPreviewFoto"
+                                     title="Klik untuk memperbesar"
+                                     onmouseover="this.style.opacity='0.8'" 
+                                     onmouseout="this.style.opacity='1'">
+                                <div class="form-text text-primary mt-1"><i class="bi bi-zoom-in"></i> Klik gambar untuk memperbesar</div>
+                            </div>
+
+                            <div class="modal fade" id="modalPreviewFoto" tabindex="-1" aria-labelledby="modalPreviewFotoLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg">
+                                  <div class="modal-header bg-dark text-white border-0">
+                                    <h5 class="modal-title" id="modalPreviewFotoLabel"><i class="bi bi-image me-2"></i>Preview Foto: <?= $data['nama_mobil']; ?></h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body text-center p-0 bg-dark">
+                                    <img src="../foto_mobil/<?= $data['foto_mobil']; ?>" class="img-fluid w-100" alt="Preview Foto">
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                         <?php endif; ?>
+                        
                         <input type="file" name="foto" class="form-control">
+                        <div class="form-text">*Kosongkan jika tidak ingin mengganti foto saat ini.</div>
                     </div>
 
                     <div class="d-grid gap-2">

@@ -6,7 +6,6 @@ include 'header.php';
 $id = $_GET['id'];
 
 // Query data mobil berdasarkan ID
-// Pastikan kolom pajak_kendaraan dipanggil (bukan transmisi)
 $data = query("SELECT * FROM tb_alternatif WHERE id_mobil = $id")[0];
 
 // Jika ID tidak ditemukan, kembalikan ke katalog
@@ -64,11 +63,11 @@ function getLabelKualitas($angka) {
                         <tr>
                             <td class="text-secondary">Pajak Kendaraan</td>
                             <td>: 
-                                <?php if($data['pajak_kendaraan'] == 'Hidup') : ?>
-                                    <span class="badge bg-success">Pajak Hidup</span>
-                                <?php else : ?>
-                                    <span class="badge bg-danger">Pajak Mati</span>
-                                <?php endif; ?>
+                                <?php 
+                                // PERBAIKAN BADGE PAJAK
+                                $bg_pajak = (strpos($data['pajak_kendaraan'], 'Hidup') !== false) ? 'bg-success' : 'bg-danger'; 
+                                ?>
+                                <span class="badge <?= $bg_pajak; ?>"><?= $data['pajak_kendaraan']; ?></span>
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +94,6 @@ function getLabelKualitas($angka) {
             <div class="d-grid gap-2">
                 <?php 
                     $pesan = "Halo Sadulur Mobilindo, saya tertarik dengan mobil " . $data['nama_mobil'] . " tahun " . $data['tahun'] . ". Apakah unit masih tersedia?";
-                    // Perbaikan: Tambahkan ?text= agar pesan otomatis terisi di WA
                     $linkWA = "https://wa.me/628872667070?text=" . urlencode($pesan);
                 ?>
                 <a href="<?= $linkWA; ?>" target="_blank" class="btn btn-success btn-lg">

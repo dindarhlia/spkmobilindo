@@ -51,7 +51,6 @@ if (isset($_POST['cari'])) {
                     <div class="position-absolute top-0 end-0 bg-warning text-dark fw-bold px-3 py-1 rounded-bottom-start shadow-sm" style="z-index: 1;">
                         <?= $m['tahun']; ?>
                     </div>
-
                     <img src="foto_mobil/<?= $m['foto_mobil']; ?>" class="card-img-top" alt="<?= $m['nama_mobil']; ?>" style="height: 220px; object-fit: cover;">
                     
                     <div class="card-body">
@@ -66,11 +65,11 @@ if (isset($_POST['cari'])) {
                             </div>
                             <div class="col-6 ps-3">
                                 <i class="bi bi-calendar-check me-1"></i> Pajak: 
-                                <?php if($m['pajak_kendaraan'] == 'Hidup') : ?>
-                                    <span class="text-success fw-bold">Hidup</span>
-                                <?php else : ?>
-                                    <span class="text-danger fw-bold">Mati</span>
-                                <?php endif; ?>
+                                <?php 
+                                // PERBAIKAN WARNA PAJAK
+                                $warna_pajak = (strpos($m['pajak_kendaraan'], 'Hidup') !== false) ? 'text-success' : 'text-danger'; 
+                                ?>
+                                <span class="<?= $warna_pajak; ?> fw-bold"><?= $m['pajak_kendaraan']; ?></span>
                             </div>
                         </div>
 
@@ -84,7 +83,6 @@ if (isset($_POST['cari'])) {
 
         <?php endif; ?>
     </div>
-
 </div>
 
 <?php include 'footer.php'; ?>

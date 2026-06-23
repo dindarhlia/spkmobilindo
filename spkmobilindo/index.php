@@ -46,7 +46,6 @@ $mobil_terbaru = query("SELECT * FROM tb_alternatif ORDER BY id_mobil DESC LIMIT
             <h2 class="fw-bold">Stok Terbaru</h2>
             <p class="text-muted">Pilihan mobil bekas berkualitas yang baru saja masuk showroom.</p>
         </div>
-
         <div class="row">
             <?php if(empty($mobil_terbaru)) : ?>
                 <div class="col-12 text-center">
@@ -67,11 +66,11 @@ $mobil_terbaru = query("SELECT * FROM tb_alternatif ORDER BY id_mobil DESC LIMIT
                                     <li class="mb-1"><i class="bi bi-speedometer2 me-2"></i>KM: <?= number_format($m['jarak_tempuh'], 0, ',', '.'); ?></li>
                                     <li>
                                         <i class="bi bi-calendar-check me-2"></i>Pajak: 
-                                        <?php if($m['pajak_kendaraan'] == 'Hidup') : ?>
-                                            <span class="text-success fw-bold">Hidup</span>
-                                        <?php else : ?>
-                                            <span class="text-danger fw-bold">Mati</span>
-                                        <?php endif; ?>
+                                        <?php 
+                                        // PERBAIKAN WARNA PAJAK
+                                        $warna_pajak = (strpos($m['pajak_kendaraan'], 'Hidup') !== false) ? 'text-success' : 'text-danger'; 
+                                        ?>
+                                        <span class="<?= $warna_pajak; ?> fw-bold"><?= $m['pajak_kendaraan']; ?></span>
                                     </li>
                                 </ul>
                                 

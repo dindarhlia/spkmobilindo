@@ -27,7 +27,7 @@ if (isset($_GET['aksi']) && $_GET['aksi'] == 'hapus') {
 }
 
 // Ambil data mobil terbaru untuk ditampilkan di tabel
-$mobil = query("SELECT * FROM tb_alternatif");
+$mobil = query("SELECT * FROM tb_alternatif ORDER BY id_mobil DESC");
 ?>
 
 <?php include 'header.php'; ?>
@@ -71,15 +71,19 @@ $mobil = query("SELECT * FROM tb_alternatif");
                         <td><?= $m['tahun']; ?></td>
                         <td><?= number_format($m['jarak_tempuh'], 0, ',', '.'); ?> km</td>
                         <td>
-                            <span class="badge <?= ($m['pajak_kendaraan'] == 'Hidup') ? 'bg-success' : 'bg-danger'; ?>">
+                            <?php 
+                            // Logika untuk menentukan warna badge
+                            $bg_pajak = (strpos($m['pajak_kendaraan'], 'Hidup') !== false) ? 'bg-success' : 'bg-danger'; 
+                            ?>
+                            <span class="badge <?= $bg_pajak; ?>">
                                 <?= $m['pajak_kendaraan']; ?>
                             </span>
                         </td>
                         <td>
-                            <a href="form_mobil.php?id=<?= $m['id_mobil']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="form_mobil.php?id=<?= $m['id_mobil']; ?>" class="btn btn-warning btn-sm mb-1">Edit</a>
                             
                             <a href="data_mobil.php?aksi=hapus&id=<?= $m['id_mobil']; ?>" 
-                               class="btn btn-danger btn-sm" 
+                               class="btn btn-danger btn-sm mb-1" 
                                onclick="return confirm('Yakin hapus data ini?')">Hapus</a>
                         </td>
                     </tr>
