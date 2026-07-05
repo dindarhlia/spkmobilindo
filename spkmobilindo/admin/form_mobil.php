@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
     $judul = "Ubah Data Mobil";
     $is_edit = true;
     $id_mobil = $_GET['id'];
-    $data = cariMobil($id_mobil); // Fungsi dari functions.php 
+    $data = cariMobil($id_mobil); 
 } else {
     $judul = "Tambah Mobil Baru";
     $is_edit = false;
@@ -15,18 +15,22 @@ if (isset($_GET['id'])) {
 // Proses Simpan Data
 if (isset($_POST['submit'])) {
     if ($is_edit) {
-        // Mode Ubah
-        if (ubahMobil($_POST) > 0) {
+        $hasil = ubahMobil($_POST);
+        if ($hasil == 1) {
             echo "<script>alert('Data berhasil diubah!'); document.location.href = 'data_mobil.php';</script>";
+        } elseif ($hasil == -1) {
+            echo "<script>alert('GAGAL! Format foto harus JPG/PNG atau ukuran file terlalu besar.');</script>";
         } else {
-            echo "<script>alert('Data gagal diubah / Tidak ada perubahan.');</script>";
+            echo "<script>alert('Data gagal diubah (Tidak ada perubahan yang tersimpan).');</script>";
         }
     } else {
-        // Mode Tambah
-        if (tambahMobil($_POST) > 0) {
+        $hasil = tambahMobil($_POST);
+        if ($hasil == 1) {
             echo "<script>alert('Data berhasil ditambahkan!'); document.location.href = 'data_mobil.php';</script>";
+        } elseif ($hasil == -1) {
+            echo "<script>alert('GAGAL! Format foto harus JPG/PNG atau ukuran file terlalu besar.');</script>";
         } else {
-            echo "<script>alert('Gagal menambahkan data!');</script>";
+            echo "<script>alert('Gagal menambahkan data ke Database! Pastikan isian sudah benar.');</script>";
         }
     }
 }
@@ -158,7 +162,7 @@ if (isset($_POST['submit'])) {
                         <?php endif; ?>
                         
                         <input type="file" name="foto" class="form-control">
-                        <div class="form-text">*Kosongkan jika tidak ingin mengganti foto saat ini.</div>
+                        <div class="form-text">*Kosongkan jika tidak ingin mengganti foto saat ini. Format wajib: JPG/JPEG/PNG.</div>
                     </div>
 
                     <div class="d-grid gap-2">

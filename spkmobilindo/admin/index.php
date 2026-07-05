@@ -20,7 +20,7 @@ if ($_SESSION['role'] === 'admin') {
     $row_rata = mysqli_fetch_assoc($result_rata);
     $rata_rata_harga = $row_rata['rata_rata'] ?? 0;
     
-    // PERBAIKAN: Mengambil tahun berjalan secara otomatis dari sistem
+    // Mengambil tahun berjalan secara otomatis dari sistem
     $tahun_sekarang = date('Y'); 
 }
 ?>
@@ -108,10 +108,15 @@ if ($_SESSION['role'] === 'admin') {
     <div class="card-body">
         <?php if ($_SESSION['role'] === 'admin') : ?>
             <?php
+                // PERBAIKAN: Menghitung status pajak dengan strpos()
                 $hidup = 0; $mati = 0;
                 foreach($mobil as $m) {
-                    if($m['pajak_kendaraan'] == 'Hidup') $hidup++;
-                    else $mati++;
+                    // Jika kata 'Hidup' ditemukan di kalimat status pajak
+                    if(strpos($m['pajak_kendaraan'], 'Hidup') !== false) {
+                        $hidup++;
+                    } else {
+                        $mati++;
+                    }
                 }
                 $persen_hidup = ($hidup / $total) * 100;
                 $persen_mati = ($mati / $total) * 100;
@@ -125,7 +130,7 @@ if ($_SESSION['role'] === 'admin') {
             </div>
             <div class="mb-3">
                 <div class="d-flex justify-content-between mb-1 small">
-                    <span>Pajak Mati (<?= $mati; ?> Unit)</span>
+                    <span>Pajak Mati / Telat (<?= $mati; ?> Unit)</span>
                     <span><?= round($persen_mati); ?>%</span>
                 </div>
                 <div class="progress" style="height: 15px;"><div class="progress-bar bg-danger" style="width: <?= $persen_mati; ?>%"></div></div>

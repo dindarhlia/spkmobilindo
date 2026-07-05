@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 23, 2026 at 12:58 PM
+-- Generation Time: Jun 30, 2026 at 09:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -67,8 +67,8 @@ CREATE TABLE `tb_alternatif` (
 
 INSERT INTO `tb_alternatif` (`id_mobil`, `nama_mobil`, `merek`, `harga_asli`, `tahun`, `jarak_tempuh`, `pajak_kendaraan`, `deskripsi`, `foto_mobil`) VALUES
 (10, 'Nissan Grand Livina', 'Nissan', 115000000, 2014, 92500, 'Hidup Panjang (> 6 Bulan)', 'Varian Highway Star dengan bodi kit orisinal yang masih lengkap. Pajak hidup, interior bersih, dan performa mesin masih sangat stabil untuk pemakaian harian.', '69ef573c610cb.jpg'),
-(11, 'Nissan Serena C26', 'Nissan', 135000000, 2013, 110200, 'Telat / Mati 1 - 2 Tahun', 'Varian Highway Star, Harga lebih ekonomis karena status pajak mati, sangat cocok untuk pembeli yang berniat melakukan balik nama langsung.', '69ef581849e90.jpg'),
-(13, 'Honda CR-V Gen 2', 'Honda', 80000000, 2005, 185000, 'Telat / Mati 1 - 2 Tahun', 'SUV legendaris yang tangguh. Meskipun pajak mati dan kilometer sudah tinggi, kaki-kaki masih cukup nyaman. Harga disesuaikan agar terjangkau bagi pemula.', '69ef591c13c67.jpg'),
+(11, 'Nissan Serena C26', 'Nissan', 135000000, 2013, 110200, 'Hidup Panjang (> 6 Bulan)', 'Varian Highway Star, Harga lebih ekonomis karena status pajak mati, sangat cocok untuk pembeli yang berniat melakukan balik nama langsung.', '69ef581849e90.jpg'),
+(13, 'Honda CR-V Gen 2', 'Honda', 80000000, 2005, 185000, 'Hidup Pendek (< 6 Bulan)', 'SUV legendaris yang tangguh. Meskipun pajak mati dan kilometer sudah tinggi, kaki-kaki masih cukup nyaman. Harga disesuaikan agar terjangkau bagi pemula.', '69ef591c13c67.jpg'),
 (14, 'Toyota Camry', 'Toyota', 120000000, 2010, 140000, 'Hidup Panjang (> 6 Bulan)', 'Menawarkan kenyamanan sedan kelas pejabat. Pajak hidup terjamin, mesin halus tanpa rembesan oli, dan semua fitur elektrikal kabin berfungsi dengan normal.', '69ef59a654a5a.jpg'),
 (15, 'Nissan Grand Livina', 'Nissan', 98000000, 2013, 125400, 'Hidup Panjang (> 6 Bulan)', 'Varian SV Facelift dengan tampilan elegan warna hitam solid. Kondisi bodi sangat rapi, pajak hidup panjang (09.29), dan mesin tergolong sehat. Cocok untuk mobil operasional keluarga dengan harga di bawah 100 juta.', '69ef6432ec33e.jpg'),
 (16, 'Honda Freed', 'Honda', 142000000, 2010, 115000, 'Hidup Panjang (> 6 Bulan)', 'Tipe PSD dengan pintu geser otomatis kiri-kanan berfungsi normal. Interior captain seat yang nyaman, pajak hidup (06.30), dan bodi abu-abu metalik yang masih orisinal.', '69ef64d548bd4.jpg'),
@@ -83,7 +83,9 @@ INSERT INTO `tb_alternatif` (`id_mobil`, `nama_mobil`, `merek`, `harga_asli`, `t
 (25, 'Nissan Grand Livina Facelift - Perak', 'Nissan', 110000000, 2012, 112000, 'Hidup Pendek (< 6 Bulan)', 'Model facelift dengan transmisi X-Tronic CVT yang halus. Warna perak metalik, bodi orisinal, interior rapi, dan pajak hidup (07.29). Mobil keluarga yang stabil dan irit bahan bakar.', '69f0627276b44.jpg'),
 (26, 'Wuling Cortez - Cokelat', 'Wuling', 145000000, 2018, 75000, 'Hidup Panjang (> 6 Bulan)', 'MPV modern dengan fitur kelas atas. Kondisi bodi sangat mulus, kilometer tergolong rendah untuk tahunnya, dan pajak hidup (01.30)', '69f0655c75de4.jpg'),
 (27, 'Mazda 2 R (SkyActiv)', 'Mazda', 165000000, 2013, 82000, 'Hidup Panjang (> 6 Bulan)', 'Hatchback premium dengan teknologi SkyActiv dan warna Soul Red khas Mazda. Kondisi sangat terawat, cat orisinal, interior mewah dengan fitur modern, dan pajak hidup (01.27).', '69f068841f681.jpg'),
-(29, 'Honda CR-V Gen 2', 'Honda', 95000000, 2005, 174998, 'Hidup Panjang (> 6 Bulan)', 'Unit modifikasi eye-catching dengan cat bunglon (Chameleon Paint) hijau-ungu, pajak hidup (08.29), dan mesin 2.400cc yang responsif. Pilihan menarik bagi pecinta SUV yang ingin tampil beda.', '69f069d52be7f.jpg');
+(29, 'Honda CR-V Gen 2', 'Honda', 95000000, 2005, 174998, 'Hidup Panjang (> 6 Bulan)', 'Unit modifikasi eye-catching dengan cat bunglon (Chameleon Paint) hijau-ungu, pajak hidup (08.29), dan mesin 2.400cc yang responsif. Pilihan menarik bagi pecinta SUV yang ingin tampil beda.', '69f069d52be7f.jpg'),
+(30, 'Honda CR-V 2.4', 'Honda', 175000000, 2012, 130000, 'Hidup Panjang (> 6 Bulan)', 'mesin terawat dan bertenaga', '6a3e3746cdf55.jpg'),
+(32, 'Mitsubishi Pajero Sport', 'Mitsubishi', 448000000, 2022, 74090, 'Hidup Panjang (> 6 Bulan)', 'Kondisi bodi putih mulus, mesin diesel bertenaga, fitur keamanan aktif lengkap, dan pajak hidup (09.29). Unit tangguh yang siap digunakan di segala medan.', '6a41fb51ae4fe.jpg');
 
 -- --------------------------------------------------------
 
@@ -105,12 +107,12 @@ CREATE TABLE `tb_kriteria` (
 
 INSERT INTO `tb_kriteria` (`id_kriteria`, `kode_kriteria`, `nama_kriteria`, `atribut`, `bobot`) VALUES
 (1, 'C1', 'Harga', 'cost', 0.16),
-(2, 'C2', 'Kondisi Mesin', 'benefit', 0.13),
-(3, 'C3', 'Kondisi Bodi', 'benefit', 0.13),
-(4, 'C4', 'Tahun Produksi', 'benefit', 0.16),
+(2, 'C2', 'Kondisi Mesin', 'benefit', 0.17),
+(3, 'C3', 'Kondisi Bodi', 'benefit', 0.15),
+(4, 'C4', 'Tahun Produksi', 'benefit', 0.09),
 (5, 'C5', 'Jarak Tempuh (KM)', 'cost', 0.1),
-(6, 'C6', 'Kelengkapan Surat', 'benefit', 0.16),
-(7, 'C7', 'Pajak Kendaraan', 'benefit', 0.16);
+(6, 'C6', 'Kelengkapan Surat', 'benefit', 0.18),
+(7, 'C7', 'Pajak Kendaraan', 'benefit', 0.15);
 
 -- --------------------------------------------------------
 
@@ -143,14 +145,14 @@ INSERT INTO `tb_penilaian` (`id_penilaian`, `id_mobil`, `id_kriteria`, `nilai`) 
 (74, 11, 4, 3),
 (75, 11, 5, 3),
 (76, 11, 6, 5),
-(77, 11, 7, 3),
+(77, 11, 7, 5),
 (85, 13, 1, 1),
 (86, 13, 2, 3),
 (87, 13, 3, 3),
 (88, 13, 4, 2),
 (89, 13, 5, 4),
 (90, 13, 6, 4),
-(91, 13, 7, 3),
+(91, 13, 7, 4),
 (92, 14, 1, 2),
 (93, 14, 2, 4),
 (94, 14, 3, 3),
@@ -255,7 +257,21 @@ INSERT INTO `tb_penilaian` (`id_penilaian`, `id_mobil`, `id_kriteria`, `nilai`) 
 (200, 29, 4, 2),
 (201, 29, 5, 4),
 (202, 29, 6, 5),
-(203, 29, 7, 5);
+(203, 29, 7, 5),
+(204, 30, 1, 3),
+(205, 30, 2, 5),
+(206, 30, 3, 4),
+(207, 30, 4, 3),
+(208, 30, 5, 3),
+(209, 30, 6, 5),
+(210, 30, 7, 5),
+(218, 32, 1, 5),
+(219, 32, 2, 5),
+(220, 32, 3, 5),
+(221, 32, 4, 5),
+(222, 32, 5, 2),
+(223, 32, 6, 5),
+(224, 32, 7, 5);
 
 --
 -- Indexes for dumped tables
@@ -301,7 +317,7 @@ ALTER TABLE `tb_admin`
 -- AUTO_INCREMENT for table `tb_alternatif`
 --
 ALTER TABLE `tb_alternatif`
-  MODIFY `id_mobil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id_mobil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `tb_kriteria`
@@ -313,7 +329,7 @@ ALTER TABLE `tb_kriteria`
 -- AUTO_INCREMENT for table `tb_penilaian`
 --
 ALTER TABLE `tb_penilaian`
-  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
+  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- Constraints for dumped tables

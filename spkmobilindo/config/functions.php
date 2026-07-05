@@ -17,7 +17,6 @@ function query($query) {
 
 // =========================================================================
 // MESIN KONVERSI OTOMATIS (Menerjemahkan Angka Riil ke Skala 1-5 MOORA)
-// Sesuai dengan Tabel 3.3 di Skripsi
 // =========================================================================
 
 function konversiNilaiHarga($harga) {
@@ -56,12 +55,36 @@ function konversiNilaiPajak($status_pajak) {
     return 3; 
 }
 
-// Fungsi bantu untuk memastikan KM murni angka integer
-function bersihkanAngkaKM($angka) {
-    return intval(preg_replace("/[^0-9]/", "", $angka));
+// Fungsi bantu untuk memastikan KM dan Harga terhindar dari error desimal
+function bersihkanAngka($angka) {
+    return preg_replace("/[^0-9]/", "", (string)$angka);
 }
 
 // =========================================================================
+// FUNGSI CRUD DATA MOBIL
+// =========================================================================
+
+function upload() {
+    $namaFile   = $_FILES['foto']['name'];
+    $tmpName    = $_FILES['foto']['tmp_name'];
+    $error      = $_FILES['foto']['error'];
+
+    // Jika admin sengaja tidak upload foto (error 4)
+    if ($error === 4) return ''; 
+    
+    // Jika ada error upload (misal ukuran melebih batas maksimal server)
+    if ($error !== 0) return false;
+
+    $ekstensiValid = ['jpg', 'jpeg', 'png'];
+    $ekstensiParts = explode('.', $namaFile);
+    $ekstensi      = strtolower(end($ekstensiParts));
+
+    if (!in_array($ekstensi, $ekstensiValid)) return false;
+
+    $namaBaru = uniqid() . '.' . $ekstensi;
+    move_uploaded_file($tmpName, '../foto_mobil/' . $namaBaru);
+    return $namaBaru;
+}
 
 function tambahMobil($data) {
     global $conn;
@@ -69,29 +92,36 @@ function tambahMobil($data) {
     $nama_mobil = mysqli_real_escape_string($conn, $data['nama_mobil']);
     $merek      = mysqli_real_escape_string($conn, $data['merek']);
     $deskripsi  = mysqli_real_escape_string($conn, $data['deskripsi']);
-    $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan']); 
+    $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan'] ?? ''); 
     
-    // Data Riil untuk Tabel tb_alternatif
-    $harga = htmlspecialchars($data['harga_asli']); 
+    $harga = bersihkanAngka($data['harga_asli']); 
     $tahun = htmlspecialchars($data['tahun']);
-    $jarak = bersihkanAngkaKM($data['jarak_tempuh']); 
+    $jarak = bersihkanAngka($data['jarak_tempuh']); 
 
     $foto = upload();
-    if (!$foto) return false; 
+    // Return -1 jika foto gagal diupload (karena format/ukuran)
+    if ($foto === false) return -1; 
 
+    // PERBAIKAN: Menyebutkan nama kolom satu persatu agar 100% Anti-Error
     $query_mobil = "INSERT INTO tb_alternatif 
-                    VALUES (NULL, '$nama_mobil', '$merek', '$harga', '$tahun', '$jarak', '$pajak', '$deskripsi', '$foto')";
+                    (nama_mobil, merek, harga_asli, tahun, jarak_tempuh, pajak_kendaraan, deskripsi, foto_mobil) 
+                    VALUES 
+                    ('$nama_mobil', '$merek', '$harga', '$tahun', '$jarak', '$pajak', '$deskripsi', '$foto')";
     
-    mysqli_query($conn, $query_mobil);
+    $insert_berhasil = mysqli_query($conn, $query_mobil);
+    
+    // Return 0 jika query utama gagal
+    if (!$insert_berhasil) return 0; 
+    
     $id_baru = mysqli_insert_id($conn);
 
-    // KEAJAIBAN BACKEND: Mencegat data riil dan Mengonversi ke skala 1-5
+    // Otomatisasi konversi riil ke 1-5
     $nilai_harga = konversiNilaiHarga($harga);
     $nilai_tahun = konversiNilaiTahun($tahun);
     $nilai_jarak = konversiNilaiKM($jarak);
     $nilai_pajak = konversiNilaiPajak($pajak);
 
-    // Simpan Angka Skala (1-5) ke Tabel tb_penilaian untuk Dihitung MOORA
+    // Simpan nilai matriks
     simpanNilai($id_baru, 1, $nilai_harga); 
     simpanNilai($id_baru, 2, $data['kondisi_mesin']); 
     simpanNilai($id_baru, 3, $data['kondisi_bodi']);  
@@ -100,7 +130,8 @@ function tambahMobil($data) {
     simpanNilai($id_baru, 6, $data['kelengkapan_surat']); 
     simpanNilai($id_baru, 7, $nilai_pajak); 
 
-    return mysqli_affected_rows($conn);
+    // Sukses 100%
+    return 1;
 }
 
 function ubahMobil($data) {
@@ -110,15 +141,20 @@ function ubahMobil($data) {
     $nama_mobil = mysqli_real_escape_string($conn, $data['nama_mobil']);
     $merek      = mysqli_real_escape_string($conn, $data['merek']);
     $deskripsi  = mysqli_real_escape_string($conn, $data['deskripsi']);
-    $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan']); 
+    $pajak      = mysqli_real_escape_string($conn, $data['pajak_kendaraan'] ?? ''); 
     $gambarLama = $data['gambarLama'];
 
-    // Data Riil untuk Tabel tb_alternatif
-    $harga = htmlspecialchars($data['harga_asli']);
+    $harga = bersihkanAngka($data['harga_asli']);
     $tahun = htmlspecialchars($data['tahun']);
-    $jarak = bersihkanAngkaKM($data['jarak_tempuh']);
+    $jarak = bersihkanAngka($data['jarak_tempuh']);
 
-    $foto = ($_FILES['foto']['error'] === 4) ? $gambarLama : upload();
+    // Cek foto baru
+    if ($_FILES['foto']['error'] === 4) {
+        $foto = $gambarLama;
+    } else {
+        $foto = upload();
+        if ($foto === false) return -1; // Format / ukuran foto salah
+    }
 
     $query = "UPDATE tb_alternatif SET
                 nama_mobil      = '$nama_mobil',
@@ -131,15 +167,14 @@ function ubahMobil($data) {
                 foto_mobil      = '$foto'
               WHERE id_mobil = $id";
     
-    mysqli_query($conn, $query);
+    $update_berhasil = mysqli_query($conn, $query);
+    if (!$update_berhasil) return 0;
 
-    // KEAJAIBAN BACKEND: Mencegat data riil dan Mengonversi ke skala 1-5
     $nilai_harga = konversiNilaiHarga($harga);
     $nilai_tahun = konversiNilaiTahun($tahun);
     $nilai_jarak = konversiNilaiKM($jarak);
     $nilai_pajak = konversiNilaiPajak($pajak);
 
-    // Update Angka Skala (1-5) ke Tabel tb_penilaian untuk Dihitung MOORA
     updateNilai($id, 1, $nilai_harga);
     updateNilai($id, 2, $data['kondisi_mesin']);
     updateNilai($id, 3, $data['kondisi_bodi']);
@@ -148,12 +183,13 @@ function ubahMobil($data) {
     updateNilai($id, 6, $data['kelengkapan_surat']);
     updateNilai($id, 7, $nilai_pajak);
 
-    return true; 
+    return 1; 
 }
 
 function simpanNilai($id_mobil, $id_kriteria, $nilai) {
     global $conn;
-    $query = "INSERT INTO tb_penilaian VALUES (NULL, $id_mobil, $id_kriteria, '$nilai')";
+    // PERBAIKAN: Menyebutkan nama kolom agar terhindar dari Error NULL Primary Key
+    $query = "INSERT INTO tb_penilaian (id_mobil, id_kriteria, nilai) VALUES ($id_mobil, $id_kriteria, '$nilai')";
     mysqli_query($conn, $query);
 }
 
@@ -169,22 +205,9 @@ function hapusMobil($id) {
     return mysqli_affected_rows($conn);
 }
 
-function upload() {
-    $namaFile   = $_FILES['foto']['name'];
-    $tmpName    = $_FILES['foto']['tmp_name'];
-    $error      = $_FILES['foto']['error'];
-
-    if ($error === 4) return false;
-
-    $ekstensiValid = ['jpg', 'jpeg', 'png'];
-    $ekstensi      = strtolower(pathinfo($namaFile, PATHINFO_EXTENSION));
-
-    if (!in_array($ekstensi, $ekstensiValid)) return false;
-
-    $namaBaru = uniqid() . '.' . $ekstensi;
-    move_uploaded_file($tmpName, '../foto_mobil/' . $namaBaru);
-    return $namaBaru;
-}
+// =========================================================================
+// FUNGSI MOORA SPK
+// =========================================================================
 
 function hitungMOORA() {
     global $conn;
@@ -197,7 +220,6 @@ function hitungMOORA() {
     $matriks_x = [];
     foreach ($alternatif as $alt) {
         $id_m = $alt['id_mobil'];
-        // Pada titik ini, data yang diambil dari tb_penilaian SUDAH berupa skala 1-5 berkat fungsi konversi di atas
         $penilaian = query("SELECT * FROM tb_penilaian WHERE id_mobil = $id_m");
         foreach ($penilaian as $val) {
             $matriks_x[$id_m][$val['id_kriteria']] = $val['nilai'];
