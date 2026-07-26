@@ -205,8 +205,9 @@ function hapusMobil($id) {
     return mysqli_affected_rows($conn);
 }
 
+
 // =========================================================================
-// FUNGSI MOORA SPK
+// FUNGSI MOORA SPK - UNTUK ADMIN (BOBOT DATABASE)
 // =========================================================================
 
 function hitungMOORA() {
@@ -283,6 +284,100 @@ function hitungMOORA() {
         'ranking'     => $ranking
     ];
 }
+
+
+// =========================================================================
+// FUNGSI MOORA SPK - KHUSUS PUBLIK / SIMULASI (BOBOT DINAMIS INPUTAN USER)
+// =========================================================================
+
+function hitungMOORA_publik($bobot_dinamis) {
+    global $conn;
+    
+    $kriteria   = query("SELECT * FROM tb_kriteria ORDER BY id_kriteria ASC");
+    $alternatif = query("SELECT * FROM tb_alternatif");
+
+    if (empty($alternatif)) return [];
+
+    // 1. Susun Matriks Keputusan (X) dari tb_penilaian
+    $matriks_x = [];
+    foreach ($alternatif as $alt) {
+        $id_m = $alt['id_mobil'];
+        $penilaian = query("SELECT * FROM tb_penilaian WHERE id_mobil = $id_m");
+        foreach ($penilaian as $val) {
+            $matriks_x[$id_m][$val['id_kriteria']] = $val['nilai'];
+        }
+    }
+
+    // 2. Hitung Nilai Pembagi
+    $pembagi = [];
+    foreach ($kriteria as $k) {
+        $id_k = $k['id_kriteria'];
+        $sum_kuadrat = 0;
+        foreach ($alternatif as $alt) {
+            $nilai = $matriks_x[$alt['id_mobil']][$id_k] ?? 0;
+            $sum_kuadrat += pow($nilai, 2);
+        }
+        $pembagi[$id_k] = sqrt($sum_kuadrat);
+    }
+
+    // 3. Matriks Ternormalisasi Berbobot (R * W) & Optimasi (Yi)
+    $ranking = [];
+    foreach ($alternatif as $alt) {
+        $id_m = $alt['id_mobil'];
+        $total_benefit = 0;
+        $total_cost = 0;
+
+        foreach ($kriteria as $k) {
+            $id_k = $k['id_kriteria'];
+            $nilai_pembagi = ($pembagi[$id_k] == 0) ? 1 : $pembagi[$id_k];
+            
+            // Proses Normalisasi
+            $r = ($matriks_x[$id_m][$id_k] ?? 0) / $nilai_pembagi;
+            
+            // INJEKSI BOBOT DINAMIS: Menggunakan bobot hasil normalisasi inputan user
+            $bobot_aktif = $bobot_dinamis[$id_k] ?? 0;
+            $weighted = $r * $bobot_aktif;
+
+            // Penentuan Klasifikasi Atribut (Benefit / Cost)
+            $atribut = strtolower($k['atribut']);
+            
+            // STRICT RULE: Klasifikasi mutlak untuk Pajak Kendaraan (ID 7) sebagai Benefit
+            if ($id_k == 7) {
+                $atribut = 'benefit'; 
+            }
+
+            if ($atribut == 'benefit') {
+                $total_benefit += $weighted;
+            } else {
+                $total_cost += $weighted;
+            }
+        }
+
+        // 4. Hitung Nilai Akhir
+        $nilai_akhir = $total_benefit - $total_cost;
+
+        $ranking[] = [
+            'id_mobil'    => $id_m,
+            'nama_mobil'  => $alt['nama_mobil'],
+            'foto'        => $alt['foto_mobil'],
+            'harga'       => $alt['harga_asli'],
+            'nilai_akhir' => $nilai_akhir,
+            'skor'        => $nilai_akhir, // Disiapkan untuk memudahkan pemanggilan di form publik
+            'data'        => $alt
+        ];
+    }
+
+    // 5. Perangkingan
+    usort($ranking, function($a, $b) {
+        return $b['nilai_akhir'] <=> $a['nilai_akhir'];
+    });
+
+    return $ranking;
+}
+
+// =========================================================================
+// UTILITY FUNCTIONS
+// =========================================================================
 
 function cariMobil($id) {
     $m = query("SELECT * FROM tb_alternatif WHERE id_mobil = $id");

@@ -3,92 +3,42 @@
 include 'header.php';
 
 // Inisialisasi Variabel Hasil agar tidak error saat pertama kali load
-$hasil_rekomendasi = [];
+$top_3 = [];
 $is_submitted = false;
 
 // PROSES SAAT TOMBOL DITEKAN
 if (isset($_POST['hitung'])) {
     $is_submitted = true;
     
-    // 1. Ambil Input Preferensi User (Skala 1-5)
-    $bobot_input = [
-        1 => $_POST['p_harga'],    // C1 (Cost)
-        2 => $_POST['p_mesin'],    // C2 (Benefit)
-        3 => $_POST['p_bodi'],     // C3 (Benefit)
-        4 => $_POST['p_tahun'],    // C4 (Benefit)
-        5 => $_POST['p_km'],       // C5 (Cost)
-        6 => $_POST['p_surat'],    // C6 (Benefit)
-        7 => $_POST['p_pajak']     // C7 (Benefit)
+    // 1. Ambil Input Mentah Preferensi User (Skala 1-5)
+    // Di-mapping sesuai id_kriteria di database
+    $input_mentah = [
+        1 => (float)$_POST['p_harga'],    // C1 (Cost)
+        2 => (float)$_POST['p_mesin'],    // C2 (Benefit)
+        3 => (float)$_POST['p_bodi'],     // C3 (Benefit)
+        4 => (float)$_POST['p_tahun'],    // C4 (Benefit)
+        5 => (float)$_POST['p_km'],       // C5 (Cost)
+        6 => (float)$_POST['p_surat'],    // C6 (Benefit)
+        7 => (float)$_POST['p_pajak']     // C7 (Benefit) - Pasti jadi benefit
     ];
     
-    // 2. Normalisasi Bobot Input User (Total bobot harus = 1)
-    $total_bobot_input = array_sum($bobot_input);
-    $bobot_baru = [];
-    foreach ($bobot_input as $id_kriteria => $nilai) {
-        $bobot_baru[$id_kriteria] = $nilai / $total_bobot_input;
+    // 2. Normalisasi Bobot Input User (Total Sigma = 1.00)
+    $total_input = array_sum($input_mentah);
+    $bobot_dinamis = [];
+    foreach ($input_mentah as $id_kriteria => $nilai) {
+        if ($total_input > 0) {
+            $bobot_dinamis[$id_kriteria] = $nilai / $total_input;
+        } else {
+            // Pengaman (Fail-safe) jika terjadi error manipulasi elemen inspect form
+            $bobot_dinamis[$id_kriteria] = 1 / 7;
+        }
     }
 
-    // 3. Jalankan Logika MOORA (Versi Custom untuk Simulasi)
-    $alternatif = query("SELECT * FROM tb_alternatif");
-    $penilaian_db = query("SELECT * FROM tb_penilaian");
+    // 3. Panggil Fungsi Otak SPK MOORA (Pembobotan Ganda) dari functions.php
+    // Hasil yang dikembalikan otomatis sudah di-ranking dari tertinggi ke terendah
+    $hasil_rekomendasi = hitungMOORA_publik($bobot_dinamis);
     
-    // Susun Matriks X
-    $matriks_x = [];
-    foreach ($penilaian_db as $p) {
-        $matriks_x[$p['id_mobil']][$p['id_kriteria']] = $p['nilai'];
-    }
-    
-    // B. Hitung Pembagi (Akar Kuadrat)
-    $pembagi = [];
-    for ($k=1; $k<=7; $k++) {
-        $sum_kuadrat = 0;
-        foreach ($alternatif as $alt) {
-            $val = $matriks_x[$alt['id_mobil']][$k] ?? 0;
-            $sum_kuadrat += pow($val, 2);
-        }
-        $pembagi[$k] = sqrt($sum_kuadrat);
-    }
-    
-    // C. Normalisasi & Optimasi (Yi) pakai Bobot Baru User
-    foreach ($alternatif as $alt) {
-        $id_m = $alt['id_mobil'];
-        $total_benefit = 0;
-        $total_cost = 0;
-        
-        // C1(Harga) & C5(KM) adalah COST. Sisanya BENEFIT.
-        $arr_cost = [1, 5]; 
-        
-        for ($k=1; $k<=7; $k++) {
-            $pembagi_k = ($pembagi[$k] == 0) ? 1 : $pembagi[$k];
-            $raw = $matriks_x[$id_m][$k] ?? 0;
-            
-            // Normalisasi
-            $r = $raw / $pembagi_k;
-            
-            // Terbobot (Pakai $bobot_baru dari input user)
-            $y = $r * $bobot_baru[$k];
-            
-            if (in_array($k, $arr_cost)) {
-                $total_cost += $y;
-            } else {
-                $total_benefit += $y;
-            }
-        }
-        
-        $nilai_akhir = $total_benefit - $total_cost;
-        
-        $hasil_rekomendasi[] = [
-            'data' => $alt,
-            'skor' => $nilai_akhir
-        ];
-    }
-    
-    // 4. Urutkan dari Skor Tertinggi (Ranking)
-    usort($hasil_rekomendasi, function($a, $b) {
-        return $b['skor'] <=> $a['skor'];
-    });
-    
-    // Ambil 3 Teratas saja
+    // 4. Ambil 3 Teratas Saja untuk ditampilkan
     $top_3 = array_slice($hasil_rekomendasi, 0, 3);
 }
 ?>
