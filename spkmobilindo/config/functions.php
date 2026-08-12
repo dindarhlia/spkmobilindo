@@ -55,6 +55,17 @@ function konversiNilaiPajak($status_pajak) {
     return 3; 
 }
 
+// [REVISI] Fungsi Baru untuk Konversi Merek Mobil
+function konversiNilaiMerek($merek) {
+    // Ubah ke huruf kecil dan hilangkan spasi berlebih agar pencocokan akurat
+    $m = strtolower(trim($merek)); 
+    if (in_array($m, ['toyota', 'honda'])) return 5;
+    if (in_array($m, ['daihatsu', 'suzuki', 'mitsubishi'])) return 4;
+    if (in_array($m, ['nissan', 'mazda', 'wuling'])) return 3;
+    if (in_array($m, ['chevrolet', 'ford', 'hyundai'])) return 2;
+    return 1; // Merek lainnya
+}
+
 // Fungsi bantu untuk memastikan KM dan Harga terhindar dari error desimal
 function bersihkanAngka($angka) {
     return preg_replace("/[^0-9]/", "", (string)$angka);
@@ -99,18 +110,14 @@ function tambahMobil($data) {
     $jarak = bersihkanAngka($data['jarak_tempuh']); 
 
     $foto = upload();
-    // Return -1 jika foto gagal diupload (karena format/ukuran)
     if ($foto === false) return -1; 
 
-    // PERBAIKAN: Menyebutkan nama kolom satu persatu agar 100% Anti-Error
     $query_mobil = "INSERT INTO tb_alternatif 
                     (nama_mobil, merek, harga_asli, tahun, jarak_tempuh, pajak_kendaraan, deskripsi, foto_mobil) 
                     VALUES 
                     ('$nama_mobil', '$merek', '$harga', '$tahun', '$jarak', '$pajak', '$deskripsi', '$foto')";
     
     $insert_berhasil = mysqli_query($conn, $query_mobil);
-    
-    // Return 0 jika query utama gagal
     if (!$insert_berhasil) return 0; 
     
     $id_baru = mysqli_insert_id($conn);
@@ -120,6 +127,7 @@ function tambahMobil($data) {
     $nilai_tahun = konversiNilaiTahun($tahun);
     $nilai_jarak = konversiNilaiKM($jarak);
     $nilai_pajak = konversiNilaiPajak($pajak);
+    $nilai_merek = konversiNilaiMerek($merek); // [REVISI] Generate nilai merek
 
     // Simpan nilai matriks
     simpanNilai($id_baru, 1, $nilai_harga); 
@@ -129,8 +137,8 @@ function tambahMobil($data) {
     simpanNilai($id_baru, 5, $nilai_jarak); 
     simpanNilai($id_baru, 6, $data['kelengkapan_surat']); 
     simpanNilai($id_baru, 7, $nilai_pajak); 
+    simpanNilai($id_baru, 8, $nilai_merek); // [REVISI] Insert ID Kriteria 8
 
-    // Sukses 100%
     return 1;
 }
 
@@ -148,12 +156,11 @@ function ubahMobil($data) {
     $tahun = htmlspecialchars($data['tahun']);
     $jarak = bersihkanAngka($data['jarak_tempuh']);
 
-    // Cek foto baru
     if ($_FILES['foto']['error'] === 4) {
         $foto = $gambarLama;
     } else {
         $foto = upload();
-        if ($foto === false) return -1; // Format / ukuran foto salah
+        if ($foto === false) return -1; 
     }
 
     $query = "UPDATE tb_alternatif SET
@@ -174,6 +181,7 @@ function ubahMobil($data) {
     $nilai_tahun = konversiNilaiTahun($tahun);
     $nilai_jarak = konversiNilaiKM($jarak);
     $nilai_pajak = konversiNilaiPajak($pajak);
+    $nilai_merek = konversiNilaiMerek($merek); // [REVISI] Generate nilai merek update
 
     updateNilai($id, 1, $nilai_harga);
     updateNilai($id, 2, $data['kondisi_mesin']);
@@ -182,13 +190,13 @@ function ubahMobil($data) {
     updateNilai($id, 5, $nilai_jarak); 
     updateNilai($id, 6, $data['kelengkapan_surat']);
     updateNilai($id, 7, $nilai_pajak);
+    updateNilai($id, 8, $nilai_merek); // [REVISI] Update ID Kriteria 8
 
     return 1; 
 }
 
 function simpanNilai($id_mobil, $id_kriteria, $nilai) {
     global $conn;
-    // PERBAIKAN: Menyebutkan nama kolom agar terhindar dari Error NULL Primary Key
     $query = "INSERT INTO tb_penilaian (id_mobil, id_kriteria, nilai) VALUES ($id_mobil, $id_kriteria, '$nilai')";
     mysqli_query($conn, $query);
 }
@@ -204,7 +212,6 @@ function hapusMobil($id) {
     mysqli_query($conn, "DELETE FROM tb_alternatif WHERE id_mobil = $id");
     return mysqli_affected_rows($conn);
 }
-
 
 // =========================================================================
 // FUNGSI MOORA SPK - UNTUK ADMIN (BOBOT DATABASE)
@@ -285,17 +292,25 @@ function hitungMOORA() {
     ];
 }
 
-
 // =========================================================================
-// FUNGSI MOORA SPK - KHUSUS PUBLIK / SIMULASI (BOBOT DINAMIS INPUTAN USER)
+// FUNGSI MOORA SPK - KHUSUS PUBLIK / SIMULASI (BOBOT DINAMIS & PRE-FILTER)
 // =========================================================================
 
-function hitungMOORA_publik($bobot_dinamis) {
+// [REVISI] Menambahkan parameter $keyword opsional untuk Pre-Filter Free Text
+function hitungMOORA_publik($bobot_dinamis, $keyword = "") {
     global $conn;
     
-    $kriteria   = query("SELECT * FROM tb_kriteria ORDER BY id_kriteria ASC");
-    $alternatif = query("SELECT * FROM tb_alternatif");
+    $kriteria = query("SELECT * FROM tb_kriteria ORDER BY id_kriteria ASC");
+    
+    // [REVISI] Memfilter alternatif menggunakan LIKE jika user mengisi Free Text
+    if (!empty($keyword)) {
+        $kw = mysqli_real_escape_string($conn, $keyword);
+        $alternatif = query("SELECT * FROM tb_alternatif WHERE nama_mobil LIKE '%$kw%' OR deskripsi LIKE '%$kw%'");
+    } else {
+        $alternatif = query("SELECT * FROM tb_alternatif");
+    }
 
+    // Jika filter text tidak menemukan satupun mobil, hentikan perhitungan
     if (empty($alternatif)) return [];
 
     // 1. Susun Matriks Keputusan (X) dari tb_penilaian
@@ -341,8 +356,9 @@ function hitungMOORA_publik($bobot_dinamis) {
             // Penentuan Klasifikasi Atribut (Benefit / Cost)
             $atribut = strtolower($k['atribut']);
             
-            // STRICT RULE: Klasifikasi mutlak untuk Pajak Kendaraan (ID 7) sebagai Benefit
-            if ($id_k == 7) {
+            // STRICT RULE: Klasifikasi mutlak untuk Pajak Kendaraan (7) sebagai Benefit
+            // dan (Opsional) Merek Mobil (8) sebagai Benefit jika belum diset di Database
+            if ($id_k == 7 || $id_k == 8) {
                 $atribut = 'benefit'; 
             }
 
@@ -362,7 +378,7 @@ function hitungMOORA_publik($bobot_dinamis) {
             'foto'        => $alt['foto_mobil'],
             'harga'       => $alt['harga_asli'],
             'nilai_akhir' => $nilai_akhir,
-            'skor'        => $nilai_akhir, // Disiapkan untuk memudahkan pemanggilan di form publik
+            'skor'        => $nilai_akhir,
             'data'        => $alt
         ];
     }

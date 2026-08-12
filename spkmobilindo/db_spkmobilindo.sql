@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 30, 2026 at 09:06 AM
+-- Generation Time: Aug 11, 2026 at 02:05 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -108,11 +108,12 @@ CREATE TABLE `tb_kriteria` (
 INSERT INTO `tb_kriteria` (`id_kriteria`, `kode_kriteria`, `nama_kriteria`, `atribut`, `bobot`) VALUES
 (1, 'C1', 'Harga', 'cost', 0.16),
 (2, 'C2', 'Kondisi Mesin', 'benefit', 0.17),
-(3, 'C3', 'Kondisi Bodi', 'benefit', 0.15),
+(3, 'C3', 'Kondisi Bodi', 'benefit', 0.1),
 (4, 'C4', 'Tahun Produksi', 'benefit', 0.09),
 (5, 'C5', 'Jarak Tempuh (KM)', 'cost', 0.1),
 (6, 'C6', 'Kelengkapan Surat', 'benefit', 0.18),
-(7, 'C7', 'Pajak Kendaraan', 'benefit', 0.15);
+(7, 'C7', 'Pajak Kendaraan', 'benefit', 0.15),
+(8, 'C8', 'Merek Mobil', 'benefit', 0.05);
 
 -- --------------------------------------------------------
 
@@ -271,7 +272,27 @@ INSERT INTO `tb_penilaian` (`id_penilaian`, `id_mobil`, `id_kriteria`, `nilai`) 
 (221, 32, 4, 5),
 (222, 32, 5, 2),
 (223, 32, 6, 5),
-(224, 32, 7, 5);
+(224, 32, 7, 5),
+(225, 10, 8, 3),
+(226, 11, 8, 3),
+(227, 13, 8, 5),
+(228, 14, 8, 5),
+(229, 15, 8, 3),
+(230, 16, 8, 5),
+(231, 17, 8, 3),
+(232, 18, 8, 2),
+(233, 19, 8, 3),
+(234, 20, 8, 4),
+(235, 21, 8, 5),
+(236, 22, 8, 3),
+(237, 23, 8, 3),
+(238, 24, 8, 2),
+(239, 25, 8, 3),
+(240, 26, 8, 3),
+(241, 27, 8, 3),
+(242, 29, 8, 5),
+(243, 30, 8, 5),
+(244, 32, 8, 4);
 
 --
 -- Indexes for dumped tables
@@ -323,13 +344,13 @@ ALTER TABLE `tb_alternatif`
 -- AUTO_INCREMENT for table `tb_kriteria`
 --
 ALTER TABLE `tb_kriteria`
-  MODIFY `id_kriteria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_kriteria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tb_penilaian`
 --
 ALTER TABLE `tb_penilaian`
-  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
+  MODIFY `id_penilaian` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
 
 --
 -- Constraints for dumped tables
